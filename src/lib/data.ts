@@ -13,6 +13,25 @@ export type User = {
   avatarUrl: string; // URL de la imagen de perfil.
 };
 
+// Estructura para el personal interno
+export type Staff = {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl: string;
+}
+
+// Estructura para una Oportunidad
+export type Opportunity = {
+  id: string;
+  leadCedula: string;
+  against: 'CCSS' | 'MEP' | 'Municipalidad' | 'Migración' | 'Otro';
+  opportunityType: string;
+  status: 'Nuevo' | 'Contactado' | 'Pendiente' | 'Caso Creado';
+  startDate: string;
+  assignedTo: string;
+};
+
 // Define la estructura de un objeto Voluntario.
 export type Volunteer = {
   id: string;
@@ -81,7 +100,7 @@ export type Route = {
 };
 
 
-// Lista de usuarios de ejemplo.
+// Lista de usuarios de ejemplo (Leads).
 export const users: User[] = [
   { id: 'USR001', name: 'Ana Silva Rojas', cedula: '1-1234-5678', email: 'ana.silva@example.com', phone: '8765-4321', status: 'Caso Creado', registeredOn: '2023-10-26', avatarUrl: 'https://picsum.photos/seed/avatar1/40/40' },
   { id: 'USR002', name: 'Bruno Costa Marin', cedula: '2-0987-6543', email: 'bruno.costa@example.com', phone: '6123-4567', status: 'Contactado', registeredOn: '2023-10-25', avatarUrl: 'https://picsum.photos/seed/avatar2/40/40' },
@@ -89,6 +108,27 @@ export const users: User[] = [
   { id: 'USR004', name: 'Daniel Alves Mora', cedula: '4-2222-3333', email: 'daniel.alves@example.com', phone: '5432-1876', status: 'Pendiente', registeredOn: '2023-10-24', avatarUrl: 'https://picsum.photos/seed/avatar4/40/40' },
   { id: 'USR005', name: 'Beatriz Lima Fernández', cedula: '5-3333-4444', email: 'beatriz.lima@example.com', phone: '8877-6655', status: 'Nuevo', registeredOn: '2023-10-28', avatarUrl: 'https://picsum.photos/seed/avatar5/40/40' },
 ];
+
+// Lista de personal interno
+export const staff: Staff[] = [
+  { id: 'STF001', name: 'Jorge', email: 'jorge@dsf.cr', avatarUrl: 'https://picsum.photos/seed/staff1/40/40' },
+  { id: 'STF002', name: 'Raizza', email: 'raizza@dsf.cr', avatarUrl: 'https://picsum.photos/seed/staff2/40/40' },
+  { id: 'STF003', name: 'Freddy', email: 'freddy@dsf.cr', avatarUrl: 'https://picsum.photos/seed/staff3/40/40' },
+  { id: 'STF004', name: 'Richard', email: 'richard@dsf.cr', avatarUrl: 'https://picsum.photos/seed/staff4/40/40' },
+  { id: 'STF005', name: 'Carolina', email: 'carolina@dsf.cr', avatarUrl: 'https://picsum.photos/seed/staff5/40/40' },
+  { id: 'STF006', name: 'María', email: 'maria@dsf.cr', avatarUrl: 'https://picsum.photos/seed/staff6/40/40' },
+  { id: 'STF007', name: 'Leonardo', email: 'leonardo@dsf.cr', avatarUrl: 'https://picsum.photos/seed/staff7/40/40' },
+];
+
+// Lista de oportunidades de ejemplo
+export const opportunities: Opportunity[] = [
+    { id: 'OPP001', leadCedula: '1-1234-5678', against: 'CCSS', opportunityType: 'Lista de Espera', status: 'Nuevo', startDate: '2023-11-01', assignedTo: 'Raizza' },
+    { id: 'OPP002', leadCedula: '2-0987-6543', against: 'MEP', opportunityType: 'Salarios', status: 'Contactado', startDate: '2023-11-02', assignedTo: 'Jorge' },
+    { id: 'OPP003', leadCedula: '3-1111-2222', against: 'Municipalidad', opportunityType: 'Falta de Respuesta', status: 'Pendiente', startDate: '2023-11-03', assignedTo: 'Freddy' },
+    { id: 'OPP004', leadCedula: '4-2222-3333', against: 'CCSS', opportunityType: 'Cirugía', status: 'Nuevo', startDate: '2023-11-04', assignedTo: 'Raizza' },
+    { id: 'OPP005', leadCedula: '5-3333-4444', against: 'MEP', opportunityType: 'Carrera Profesional', status: 'Caso Creado', startDate: '2023-11-05', assignedTo: 'Richard' },
+];
+
 
 // Lista de voluntarios de ejemplo.
 export const volunteers: Volunteer[] = [

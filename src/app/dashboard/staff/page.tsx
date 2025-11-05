@@ -1,6 +1,5 @@
 // Importamos iconos y componentes de la interfaz de usuario.
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,59 +23,56 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// Importamos los datos de ejemplo para las oportunidades.
-import { opportunities } from "@/lib/data";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// Importamos los datos de ejemplo para el personal.
+import { staff } from "@/lib/data";
 
-// Esta es la función principal que define la página de Oportunidades.
-export default function DealsPage() {
+// Esta es la función principal que define la página de Personal.
+export default function StaffPage() {
   return (
     <Card>
       {/* El encabezado de la tarjeta con título, descripción y botón para agregar. */}
       <CardHeader>
         <div className="flex items-center justify-between">
             <div>
-                <CardTitle>Oportunidades</CardTitle>
-                <CardDescription>Gestiona las oportunidades de clientes potenciales.</CardDescription>
+                <CardTitle>Personal Interno</CardTitle>
+                <CardDescription>Gestiona los usuarios del sistema.</CardDescription>
             </div>
             <Button size="sm" className="gap-1">
                 <PlusCircle className="h-4 w-4" />
-                Agregar Oportunidad
+                Agregar Usuario
             </Button>
         </div>
       </CardHeader>
-      {/* El contenido de la tarjeta es la tabla con la lista de oportunidades. */}
+      {/* El contenido de la tarjeta es la tabla con la lista de usuarios. */}
       <CardContent>
         <Table>
           {/* El encabezado de la tabla define las columnas. */}
           <TableHeader>
             <TableRow>
-              <TableHead>Cédula del Lead</TableHead>
-              <TableHead>Contra</TableHead>
-              <TableHead>Tipo de Oportunidad</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="hidden md:table-cell">Fecha de Inicio</TableHead>
-              <TableHead className="hidden md:table-cell">Asignado a</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead>
                 <span className="sr-only">Acciones</span>
               </TableHead>
             </TableRow>
           </TableHeader>
-          {/* El cuerpo de la tabla se llena con los datos de las oportunidades. */}
+          {/* El cuerpo de la tabla se llena con los datos del personal. */}
           <TableBody>
-            {opportunities.map((opportunity) => (
-              <TableRow key={opportunity.id}>
-                <TableCell className="font-medium">{opportunity.leadCedula}</TableCell>
+            {staff.map((user) => (
+              <TableRow key={user.id}>
                 <TableCell>
-                  <Badge variant="outline">{opportunity.against}</Badge>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user.avatarUrl} alt={user.name} />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="font-medium">{user.name}</div>
+                  </div>
                 </TableCell>
-                <TableCell>{opportunity.opportunityType}</TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  <Badge variant={opportunity.status === 'Caso Creado' ? 'default' : 'secondary'}>{opportunity.status}</Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">{opportunity.startDate}</TableCell>
-                <TableCell className="hidden md:table-cell">{opportunity.assignedTo}</TableCell>
-                <TableCell>
-                  {/* Menú desplegable con acciones para cada oportunidad. */}
+                  {/* Menú desplegable con acciones para cada usuario. */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -86,9 +82,8 @@ export default function DealsPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem>Ver Detalle</DropdownMenuItem>
-                      <DropdownMenuItem>Convertir a Caso</DropdownMenuItem>
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
+                      <DropdownMenuItem>Ver Perfil</DropdownMenuItem>
+                      <DropdownMenuItem>Editar Permisos</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive">Eliminar</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
