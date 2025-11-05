@@ -148,19 +148,19 @@ export const branches: Branch[] = [
 
 // Lista de casos de ejemplo.
 export const cases: Case[] = [
-  { id: 'CAS001', title: 'Lista de espera por cirugía vs. CCSS', clientName: 'Ana Silva Rojas', assignedTo: 'Eduardo Martins', status: 'Sentencia', lastUpdate: '2023-11-01', category: 'Contenciosa', specialty: 'Cirugía General', opportunityLifecycle: 90 },
-  { id: 'CAS002', title: 'Cita a largo plazo para radiología vs. CCSS', clientName: 'John Doe', assignedTo: 'Fernanda Lima', status: 'Abierto', lastUpdate: '2023-10-30', category: 'No Contenciosa', specialty: 'Radiología', opportunityLifecycle: 25 },
+  { id: '23-12345-6789-CO', title: 'Lista de espera por cirugía vs. CCSS', clientName: 'Ana Silva Rojas', assignedTo: 'Eduardo Martins', status: 'Sentencia', lastUpdate: '2023-11-01', category: 'Contenciosa', specialty: 'Cirugía General', opportunityLifecycle: 90 },
+  { id: '23-54321-9876-CO', title: 'Cita a largo plazo para radiología vs. CCSS', clientName: 'John Doe', assignedTo: 'Fernanda Lima', status: 'Abierto', lastUpdate: '2023-10-30', category: 'No Contenciosa', specialty: 'Radiología', opportunityLifecycle: 25 },
   { id: 'CAS003', title: 'Atraso en pago de salarios vs. MEP', clientName: 'Jane Smith', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-09-15', category: 'Contenciosa', specialty: 'Recursos Humanos', opportunityLifecycle: 50 },
   { id: 'CAS004', title: 'Falta de pago por carrera profesional vs. MEP', clientName: 'Bruno Costa Marin', assignedTo: 'Gabriel Rocha', status: 'Sentencia', lastUpdate: '2023-11-05', category: 'No Contenciosa', specialty: 'Pagos', opportunityLifecycle: 95 },
-  { id: 'EJC001', amparoId: 'CAS001', clientName: 'Ana Silva Rojas', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-11-10', category: 'Contenciosa', specialty: 'Cobro Judicial', opportunityLifecycle: 40 },
+  { id: 'EJC001', amparoId: '23-12345-6789-CO', clientName: 'Ana Silva Rojas', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-11-10', category: 'Contenciosa', specialty: 'Cobro Judicial', opportunityLifecycle: 40 },
 ];
 
 // Lista de notificaciones de ejemplo.
 export const notifications = [
     { id: 1, text: 'Nueva oportunidad "Carla Díaz Solano" registrada.', time: 'hace 10 min', read: false },
-    { id: 2, text: 'El estado del caso #CAS001 se actualizó a "Sentencia".', time: 'hace 1 hora', read: false },
+    { id: 2, text: 'El estado del caso #23-12345-6789-CO se actualizó a "Sentencia".', time: 'hace 1 hora', read: false },
     { id: 3, text: 'La voluntaria "Fernanda Lima" acaba de registrarse.', time: 'hace 3 horas', read: true },
-    { id: 4, text: 'Se ha subido un documento para el caso #CAS002.', time: 'hace 1 día', read: true },
+    { id: 4, text: 'Se ha subido un documento para el caso #23-54321-9876-CO.', time: 'hace 1 día', read: true },
     { id: 5, text: 'Documentos para caso #CAS004 listos para retirar en Punto Autorizado Heredia.', time: 'hace 2 días', read: true },
 ];
 
@@ -172,7 +172,7 @@ export const couriers: Courier[] = [
 
 // Lista de recogidas pendientes
 export const pendingPickups: PendingPickup[] = [
-  { id: 'PICK01', caseId: 'CAS001', clientName: 'Ana Silva Rojas', branchId: 'BRH002', branchName: 'Punto Autorizado Heredia', documentCount: 3, status: 'Pendiente de Retiro' },
+  { id: 'PICK01', caseId: '23-12345-6789-CO', clientName: 'Ana Silva Rojas', branchId: 'BRH002', branchName: 'Punto Autorizado Heredia', documentCount: 3, status: 'Pendiente de Retiro' },
   { id: 'PICK02', caseId: 'CAS004', clientName: 'Bruno Costa Marin', branchId: 'BRH003', branchName: 'Punto Autorizado Cartago', documentCount: 2, status: 'Pendiente de Retiro' },
   { id: 'PICK03', caseId: 'CAS005', clientName: 'Otro Cliente', branchId: 'BRH002', branchName: 'Punto Autorizado Heredia', documentCount: 1, status: 'Pendiente de Retiro' },
 ];
