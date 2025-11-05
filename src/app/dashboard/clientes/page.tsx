@@ -54,6 +54,7 @@ export default function ClientesPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Cliente</TableHead>
+              <TableHead>Cédula</TableHead>
               <TableHead className="hidden md:table-cell">Contacto</TableHead>
               <TableHead>Casos Activos</TableHead>
               <TableHead className="hidden md:table-cell">Registrado El</TableHead>
@@ -76,6 +77,7 @@ export default function ClientesPage() {
                     <div className="font-medium">{user.name}</div>
                   </div>
                 </TableCell>
+                <TableCell>{user.cedula}</TableCell>
                 <TableCell className="hidden md:table-cell">
                     <div className="text-sm text-muted-foreground">{user.email}</div>
                     <div className="text-sm text-muted-foreground">{user.phone}</div>

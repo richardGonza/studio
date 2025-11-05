@@ -53,6 +53,7 @@ export default function LeadsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Usuario</TableHead>
+              <TableHead>Cédula</TableHead>
               <TableHead className="hidden md:table-cell">Contacto</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead className="hidden md:table-cell">Registrado El</TableHead>
@@ -75,6 +76,7 @@ export default function LeadsPage() {
                     <div className="font-medium">{user.name}</div>
                   </div>
                 </TableCell>
+                <TableCell>{user.cedula}</TableCell>
                 <TableCell className="hidden md:table-cell">
                     <div className="text-sm text-muted-foreground">{user.email}</div>
                     <div className="text-sm text-muted-foreground">{user.phone}</div>

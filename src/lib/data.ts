@@ -5,6 +5,7 @@
 export type User = {
   id: string; // Identificador único del usuario.
   name: string; // Nombre del usuario.
+  cedula: string; // Cédula de identidad.
   email: string; // Correo electrónico del usuario.
   phone: string; // Teléfono del usuario.
   status: 'Nuevo' | 'Contactado' | 'Pendiente' | 'Caso Creado'; // El estado actual de la oportunidad.
@@ -82,11 +83,11 @@ export type Route = {
 
 // Lista de usuarios de ejemplo.
 export const users: User[] = [
-  { id: 'USR001', name: 'Ana Silva', email: 'ana.silva@example.com', phone: '(11) 98765-4321', status: 'Caso Creado', registeredOn: '2023-10-26', avatarUrl: 'https://picsum.photos/seed/avatar1/40/40' },
-  { id: 'USR002', name: 'Bruno Costa', email: 'bruno.costa@example.com', phone: '(21) 91234-5678', status: 'Contactado', registeredOn: '2023-10-25', avatarUrl: 'https://picsum.photos/seed/avatar2/40/40' },
-  { id: 'USR003', name: 'Carla Dias', email: 'carla.dias@example.com', phone: '(31) 95555-4444', status: 'Nuevo', registeredOn: '2023-10-27', avatarUrl: 'https://picsum.photos/seed/avatar3/40/40' },
-  { id: 'USR004', name: 'Daniel Alves', email: 'daniel.alves@example.com', phone: '(41) 94321-8765', status: 'Pendiente', registeredOn: '2023-10-24', avatarUrl: 'https://picsum.photos/seed/avatar4/40/40' },
-  { id: 'USR005', name: 'Beatriz Lima', email: 'beatriz.lima@example.com', phone: '(51) 98877-6655', status: 'Nuevo', registeredOn: '2023-10-28', avatarUrl: 'https://picsum.photos/seed/avatar5/40/40' },
+  { id: 'USR001', name: 'Ana Silva Rojas', cedula: '1-1234-5678', email: 'ana.silva@example.com', phone: '8765-4321', status: 'Caso Creado', registeredOn: '2023-10-26', avatarUrl: 'https://picsum.photos/seed/avatar1/40/40' },
+  { id: 'USR002', name: 'Bruno Costa Marin', cedula: '2-0987-6543', email: 'bruno.costa@example.com', phone: '6123-4567', status: 'Contactado', registeredOn: '2023-10-25', avatarUrl: 'https://picsum.photos/seed/avatar2/40/40' },
+  { id: 'USR003', name: 'Carla Díaz Solano', cedula: '3-1111-2222', email: 'carla.dias@example.com', phone: '7555-4444', status: 'Nuevo', registeredOn: '2023-10-27', avatarUrl: 'https://picsum.photos/seed/avatar3/40/40' },
+  { id: 'USR004', name: 'Daniel Alves Mora', cedula: '4-2222-3333', email: 'daniel.alves@example.com', phone: '5432-1876', status: 'Pendiente', registeredOn: '2023-10-24', avatarUrl: 'https://picsum.photos/seed/avatar4/40/40' },
+  { id: 'USR005', name: 'Beatriz Lima Fernández', cedula: '5-3333-4444', email: 'beatriz.lima@example.com', phone: '8877-6655', status: 'Nuevo', registeredOn: '2023-10-28', avatarUrl: 'https://picsum.photos/seed/avatar5/40/40' },
 ];
 
 // Lista de voluntarios de ejemplo.
@@ -107,16 +108,16 @@ export const branches: Branch[] = [
 
 // Lista de casos de ejemplo.
 export const cases: Case[] = [
-  { id: 'CAS001', title: 'Lista de espera por cirugía vs. CCSS', clientName: 'Ana Silva', assignedTo: 'Eduardo Martins', status: 'Sentencia', lastUpdate: '2023-11-01', category: 'Contenciosa', specialty: 'Cirugía General', opportunityLifecycle: 90 },
+  { id: 'CAS001', title: 'Lista de espera por cirugía vs. CCSS', clientName: 'Ana Silva Rojas', assignedTo: 'Eduardo Martins', status: 'Sentencia', lastUpdate: '2023-11-01', category: 'Contenciosa', specialty: 'Cirugía General', opportunityLifecycle: 90 },
   { id: 'CAS002', title: 'Cita a largo plazo para radiología vs. CCSS', clientName: 'John Doe', assignedTo: 'Fernanda Lima', status: 'Abierto', lastUpdate: '2023-10-30', category: 'No Contenciosa', specialty: 'Radiología', opportunityLifecycle: 25 },
   { id: 'CAS003', title: 'Atraso en pago de salarios vs. MEP', clientName: 'Jane Smith', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-09-15', category: 'Contenciosa', specialty: 'Recursos Humanos', opportunityLifecycle: 50 },
-  { id: 'CAS004', title: 'Falta de pago por carrera profesional vs. MEP', clientName: 'Bruno Costa', assignedTo: 'Gabriel Rocha', status: 'Sentencia', lastUpdate: '2023-11-05', category: 'No Contenciosa', specialty: 'Pagos', opportunityLifecycle: 95 },
-  { id: 'EJC001', amparoId: 'CAS001', clientName: 'Ana Silva', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-11-10', category: 'Contenciosa', specialty: 'Cobro Judicial', opportunityLifecycle: 40 },
+  { id: 'CAS004', title: 'Falta de pago por carrera profesional vs. MEP', clientName: 'Bruno Costa Marin', assignedTo: 'Gabriel Rocha', status: 'Sentencia', lastUpdate: '2023-11-05', category: 'No Contenciosa', specialty: 'Pagos', opportunityLifecycle: 95 },
+  { id: 'EJC001', amparoId: 'CAS001', clientName: 'Ana Silva Rojas', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-11-10', category: 'Contenciosa', specialty: 'Cobro Judicial', opportunityLifecycle: 40 },
 ];
 
 // Lista de notificaciones de ejemplo.
 export const notifications = [
-    { id: 1, text: 'Nueva oportunidad "Carla Dias" registrada.', time: 'hace 10 min', read: false },
+    { id: 1, text: 'Nueva oportunidad "Carla Díaz Solano" registrada.', time: 'hace 10 min', read: false },
     { id: 2, text: 'El estado del caso #CAS001 se actualizó a "Sentencia".', time: 'hace 1 hora', read: false },
     { id: 3, text: 'La voluntaria "Fernanda Lima" acaba de registrarse.', time: 'hace 3 horas', read: true },
     { id: 4, text: 'Se ha subido un documento para el caso #CAS002.', time: 'hace 1 día', read: true },
@@ -131,8 +132,8 @@ export const couriers: Courier[] = [
 
 // Lista de recogidas pendientes
 export const pendingPickups: PendingPickup[] = [
-  { id: 'PICK01', caseId: 'CAS001', clientName: 'Ana Silva', branchId: 'BRH002', branchName: 'Punto Autorizado Heredia', documentCount: 3, status: 'Pendiente de Retiro' },
-  { id: 'PICK02', caseId: 'CAS004', clientName: 'Bruno Costa', branchId: 'BRH003', branchName: 'Punto Autorizado Cartago', documentCount: 2, status: 'Pendiente de Retiro' },
+  { id: 'PICK01', caseId: 'CAS001', clientName: 'Ana Silva Rojas', branchId: 'BRH002', branchName: 'Punto Autorizado Heredia', documentCount: 3, status: 'Pendiente de Retiro' },
+  { id: 'PICK02', caseId: 'CAS004', clientName: 'Bruno Costa Marin', branchId: 'BRH003', branchName: 'Punto Autorizado Cartago', documentCount: 2, status: 'Pendiente de Retiro' },
   { id: 'PICK03', caseId: 'CAS005', clientName: 'Otro Cliente', branchId: 'BRH002', branchName: 'Punto Autorizado Heredia', documentCount: 1, status: 'Pendiente de Retiro' },
 ];
 
