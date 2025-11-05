@@ -25,30 +25,23 @@ import {
   
   // Datos de ejemplo para los archivos y mensajes.
   const files = [
-    { name: "Prueba_Contrato.pdf", type: "pdf", size: "2.3 MB" },
-    { name: "Evidencia_Foto.jpg", type: "image", size: "1.1 MB" },
-    { name: "Documentos_Adicionales.zip", type: "zip", size: "5.8 MB" },
+    { name: "Sentencia_Firme.pdf", type: "pdf", size: "1.5 MB" },
+    { name: "Calculo_Intereses.xlsx", type: "zip", size: "350 KB" },
   ];
   
   const messages = [
     {
       sender: "Cliente",
       avatar: "https://picsum.photos/seed/avatar1/40/40",
-      text: "Buenos días, adjunto los documentos que me solicitaron. ¿Necesitan algo más?",
-      time: "Ayer a las 10:30 AM",
+      text: "Buenos días, ¿hay alguna novedad sobre el pago?",
+      time: "Hoy a las 09:15 AM",
     },
     {
       sender: "Abogado",
       avatar: "https://picsum.photos/seed/admin-avatar/40/40",
-      text: "Recibido, gracias. Lo revisaremos y le informaremos cualquier novedad. Saludos.",
-      time: "Ayer a las 11:15 AM",
+      text: "Hola, estamos a la espera de la confirmación del tribunal. Le mantendremos informado.",
+      time: "Hoy a las 09:30 AM",
     },
-    {
-        sender: "Cliente",
-        avatar: "https://picsum.photos/seed/avatar1/40/40",
-        text: "Perfecto, quedo a la espera. Muchas gracias.",
-        time: "Ayer a las 11:20 AM",
-      },
   ];
   
   // Función para obtener el ícono correspondiente según el tipo de archivo.
@@ -63,12 +56,12 @@ import {
     }
   };
   
-  // Esta es la página de detalle de un caso específico.
+  // Esta es la página de detalle de una ejecución específica.
   export default function EjecucionDetailPage({ params }: { params: { id: string } }) {
-    // Buscamos el caso específico en nuestros datos usando el 'id' de la URL.
+    // Buscamos la ejecución específica en nuestros datos usando el 'id' de la URL.
     const caseItem = cases.find((c) => c.id === params.id.toUpperCase());
   
-    // Si no se encuentra el caso, mostramos un mensaje.
+    // Si no se encuentra, mostramos un mensaje.
     if (!caseItem) {
       return (
         <div className="text-center">
@@ -82,7 +75,7 @@ import {
   
     return (
       <div className="space-y-6">
-        {/* Encabezado con botón para volver a la lista de casos */}
+        {/* Encabezado con botón para volver a la lista de ejecuciones */}
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" asChild>
             <Link href="/dashboard/ejecuciones">
@@ -95,13 +88,14 @@ import {
   
         {/* Grid para organizar las tarjetas de información. */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Columna principal con detalles del caso y pruebas */}
+          {/* Columna principal con detalles de la ejecución y pruebas */}
           <div className="space-y-6 lg:col-span-2">
             <Card>
               <CardHeader>
                 <div className="flex items-start justify-between">
                     <div>
-                        <CardTitle>{caseItem.title}</CardTitle>
+                        {/* Se muestra el ID del caso ya que no hay título */}
+                        <CardTitle>Ejecución de Sentencia {caseItem.id}</CardTitle>
                         <CardDescription>Cliente: {caseItem.clientName}</CardDescription>
                     </div>
                     <Badge variant={caseItem.status === 'Cerrado' ? 'destructive' : 'default'}>
@@ -110,10 +104,13 @@ import {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <h3 className="font-medium">Especialidad</h3>
-                  <p className="text-muted-foreground">{caseItem.specialty}</p>
-                </div>
+                {/* Mostramos el ID del amparo original */}
+                {caseItem.amparoId && (
+                  <div>
+                    <h3 className="font-medium">Amparo Original</h3>
+                    <p className="text-muted-foreground">{caseItem.amparoId}</p>
+                  </div>
+                )}
                 <div>
                   <h3 className="font-medium">Abogado Asignado</h3>
                   <p className="text-muted-foreground">{caseItem.assignedTo}</p>
@@ -123,7 +120,7 @@ import {
                   <p className="text-muted-foreground">{caseItem.lastUpdate}</p>
                 </div>
                 <div>
-                  <h3 className="font-medium">Ciclo de Vida de la Oportunidad</h3>
+                  <h3 className="font-medium">Ciclo de Vida del Cobro</h3>
                   <div className="flex items-center gap-2">
                     <Progress value={caseItem.opportunityLifecycle} className="h-2" />
                     <span className="text-xs text-muted-foreground">{caseItem.opportunityLifecycle}%</span>
@@ -138,7 +135,7 @@ import {
                   <Paperclip className="h-5 w-5" />
                   Pruebas (Archivos)
                 </CardTitle>
-                <CardDescription>Archivos adjuntos relevantes para el caso.</CardDescription>
+                <CardDescription>Archivos relevantes para el proceso de cobro.</CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">

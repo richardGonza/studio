@@ -48,57 +48,33 @@ const getStatusVariant = (status: string) => {
     }
 }
 
-// Esta es la función principal que define la página de Casos.
+// Esta es la función principal que define la página de Ejecuciones.
 export default function EjecucionesPage() {
-  // La página utiliza un sistema de pestañas (Tabs) para filtrar los casos.
+  // Filtramos los datos para obtener solo las ejecuciones (identificadas por tener un amparoId).
+  const ejecuciones = cases.filter(c => c.id.startsWith('EJC'));
+  // La página utiliza un sistema de pestañas (Tabs), aunque aquí solo mostraremos todas las ejecuciones.
   return (
     <Tabs defaultValue="all">
-        {/* Aquí se definen las pestañas y el botón para agregar un nuevo caso. */}
+        {/* Aquí se definen las pestañas y el botón para agregar una nueva ejecución. */}
         <div className="flex items-center justify-between">
             <TabsList>
-                <TabsTrigger value="all">Todos</TabsTrigger>
-                <TabsTrigger value="contenciosa">Contenciosa</TabsTrigger>
-                <TabsTrigger value="no-contenciosa">No Contenciosa</TabsTrigger>
+                <TabsTrigger value="all">Todas</TabsTrigger>
             </TabsList>
             <Button size="sm" className="gap-1">
                 <PlusCircle className="h-4 w-4" />
                 Agregar Ejecución
             </Button>
         </div>
-      {/* Contenido de la pestaña "Todos". Muestra una tabla con todos los casos. */}
+      {/* Contenido que muestra una tabla con todas las ejecuciones. */}
       <TabsContent value="all">
         <Card>
           <CardHeader>
             <CardTitle>Todas las Ejecuciones</CardTitle>
-            <CardDescription>Gestiona todos las ejecuciones.</CardDescription>
+            <CardDescription>Gestiona el cobro de los amparos ganados.</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Reutilizamos el componente CasesTable para mostrar la tabla. */}
-            <CasesTable cases={cases} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      {/* Contenido de la pestaña "Contenciosa". Muestra solo los casos de esa categoría. */}
-      <TabsContent value="contenciosa">
-        <Card>
-          <CardHeader>
-            <CardTitle>Ejecuciones de Contenciosa</CardTitle>
-            <CardDescription>Gestiona las ejecuciones de tipo contenciosa.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CasesTable cases={cases.filter(c => c.category === 'Contenciosa')} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      {/* Contenido de la pestaña "No Contenciosa". */}
-      <TabsContent value="no-contenciosa">
-        <Card>
-          <CardHeader>
-            <CardTitle>Ejecuciones de No Contenciosa</CardTitle>
-            <CardDescription>Gestiona las ejecuciones de tipo no contenciosa.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CasesTable cases={cases.filter(c => c.category === 'No Contenciosa')} />
+            {/* Reutilizamos el componente ExecutionsTable para mostrar la tabla. */}
+            <ExecutionsTable cases={ejecuciones} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -106,17 +82,17 @@ export default function EjecucionesPage() {
   );
 }
 
-// Este es un componente reutilizable para mostrar la tabla de casos.
-// Recibe la lista de casos a mostrar como una propiedad (props).
-function CasesTable({ cases }: { cases: Case[] }) {
+// Este es un componente reutilizable para mostrar la tabla de ejecuciones.
+// Recibe la lista de casos (ejecuciones) a mostrar como una propiedad (props).
+function ExecutionsTable({ cases }: { cases: Case[] }) {
     return (
         <div className="relative w-full overflow-auto">
             <Table>
             <TableHeader>
                 <TableRow>
-                <TableHead>Título de la Ejecución</TableHead>
-                <TableHead className="hidden md:table-cell">Cliente</TableHead>
-                <TableHead className="hidden md:table-cell">Especialidad</TableHead>
+                <TableHead>Número de Caso</TableHead>
+                <TableHead className="hidden md:table-cell">Número de Amparo</TableHead>
+                <TableHead>Cliente</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="hidden lg:table-cell">Ciclo de Vida</TableHead>
                 <TableHead className="hidden md:table-cell">Última Actualización</TableHead>
@@ -126,20 +102,20 @@ function CasesTable({ cases }: { cases: Case[] }) {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {/* Mapeamos cada caso a una fila de la tabla. */}
+                {/* Mapeamos cada ejecución a una fila de la tabla. */}
                 {cases.map((caseItem) => (
                 <TableRow key={caseItem.id} className="hover:bg-muted/50">
                     <TableCell>
+                      {/* El enlace lleva al detalle de la ejecución específica. */}
                       <Link href={`/dashboard/ejecuciones/${caseItem.id.toLowerCase()}`} className="font-medium hover:underline">
-                        {caseItem.title}
+                        {caseItem.id}
                       </Link>
-                      <div className="text-sm text-muted-foreground">{caseItem.id}</div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">{caseItem.clientName}</TableCell>
-                    <TableCell className="hidden md:table-cell">{caseItem.specialty}</TableCell>
+                    <TableCell className="hidden md:table-cell">{caseItem.amparoId}</TableCell>
+                    <TableCell>{caseItem.clientName}</TableCell>
                     <TableCell>
-                    {/* Usamos la función getStatusVariant para darle color al estado. */}
-                    <Badge variant={getStatusVariant(caseItem.status)}>{caseItem.status}</Badge>
+                      {/* Usamos la función getStatusVariant para darle color al estado. */}
+                      <Badge variant={getStatusVariant(caseItem.status)}>{caseItem.status}</Badge>
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
                         {/* Mostramos una barra de progreso para el ciclo de vida de la oportunidad. */}
@@ -150,7 +126,7 @@ function CasesTable({ cases }: { cases: Case[] }) {
                     </TableCell>
                     <TableCell className="hidden md:table-cell">{caseItem.lastUpdate}</TableCell>
                     <TableCell>
-                    {/* Menú de acciones para cada caso. */}
+                    {/* Menú de acciones para cada ejecución. */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                         <Button aria-haspopup="true" size="icon" variant="ghost">

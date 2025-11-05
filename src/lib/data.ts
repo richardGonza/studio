@@ -33,7 +33,8 @@ export type Branch = {
 // Define la estructura de un objeto Caso.
 export type Case = {
   id: string;
-  title: string; // Título o nombre del caso.
+  title?: string; // Título o nombre del caso (opcional para ejecuciones).
+  amparoId?: string; // ID del amparo original (para ejecuciones).
   clientName: string; // Nombre del cliente asociado al caso.
   assignedTo: string; // A quién está asignado el caso.
   status: 'Abierto' | 'En Progreso' | 'En Espera' | 'Cerrado' | 'Sentencia'; // Estado actual del caso.
@@ -90,9 +91,9 @@ export const users: User[] = [
 
 // Lista de voluntarios de ejemplo.
 export const volunteers: Volunteer[] = [
-  { id: 'VOL001', name: 'Eduardo Martins', email: 'eduardo.m@example.com', expertise: 'Mensajería', availability: 'Días de semana', avatarUrl: 'https://picsum.photos/seed/avatar6/40/40' },
-  { id: 'VOL002', name: 'Fernanda Lima', email: 'fernanda.l@example.com', expertise: 'Diseño Gráfico', availability: 'Fines de semana', avatarUrl: 'https://picsum.photos/seed/avatar7/40/40' },
-  { id: 'VOL003', name: 'Gabriel Rocha', email: 'gabriel.r@example.com', expertise: 'Soporte Técnico', availability: 'Tardes', avatarUrl: 'https://picsum.photos/seed/avatar8/40/40' },
+    { id: 'VOL001', name: 'Eduardo Martins', email: 'eduardo.m@example.com', expertise: 'Mensajería', availability: 'Días de semana', avatarUrl: 'https://picsum.photos/seed/avatar6/40/40' },
+    { id: 'VOL002', name: 'Fernanda Lima', email: 'fernanda.l@example.com', expertise: 'Diseño Gráfico', availability: 'Fines de semana', avatarUrl: 'https://picsum.photos/seed/avatar7/40/40' },
+    { id: 'VOL003', name: 'Gabriel Rocha', email: 'gabriel.r@example.com', expertise: 'Soporte Técnico', availability: 'Tardes', avatarUrl: 'https://picsum.photos/seed/avatar8/40/40' },
 ];
 
 // Lista de puntos autorizados de ejemplo.
@@ -110,6 +111,7 @@ export const cases: Case[] = [
   { id: 'CAS002', title: 'Cita a largo plazo para radiología vs. CCSS', clientName: 'John Doe', assignedTo: 'Fernanda Lima', status: 'Abierto', lastUpdate: '2023-10-30', category: 'No Contenciosa', specialty: 'Radiología', opportunityLifecycle: 25 },
   { id: 'CAS003', title: 'Atraso en pago de salarios vs. MEP', clientName: 'Jane Smith', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-09-15', category: 'Contenciosa', specialty: 'Recursos Humanos', opportunityLifecycle: 50 },
   { id: 'CAS004', title: 'Falta de pago por carrera profesional vs. MEP', clientName: 'Bruno Costa', assignedTo: 'Gabriel Rocha', status: 'Sentencia', lastUpdate: '2023-11-05', category: 'No Contenciosa', specialty: 'Pagos', opportunityLifecycle: 95 },
+  { id: 'EJC001', amparoId: 'CAS001', clientName: 'Ana Silva', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-11-10', category: 'Contenciosa', specialty: 'Cobro Judicial', opportunityLifecycle: 40 },
 ];
 
 // Lista de notificaciones de ejemplo.
