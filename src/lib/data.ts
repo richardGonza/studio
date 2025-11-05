@@ -36,11 +36,47 @@ export type Case = {
   title: string; // Título o nombre del caso.
   clientName: string; // Nombre del cliente asociado al caso.
   assignedTo: string; // A quién está asignado el caso.
-  status: 'Abierto' | 'En Progreso' | 'En Espera' | 'Cerrado'; // Estado actual del caso.
+  status: 'Abierto' | 'En Progreso' | 'En Espera' | 'Cerrado' | 'Sentencia'; // Estado actual del caso.
   lastUpdate: string; // Fecha de la última actualización.
   category: 'Contenciosa' | 'No Contenciosa'; // Categoría del caso.
   opportunityLifecycle: number; // Porcentaje de progreso del ciclo de vida.
 };
+
+// Estructura para mensajeros
+export type Courier = {
+  id: string;
+  name: string;
+  phone: string;
+  vehicle: 'Motocicleta' | 'Automóvil';
+};
+
+// Estructura para recogidas pendientes
+export type PendingPickup = {
+  id: string;
+  caseId: string;
+  clientName: string;
+  branchId: string;
+  branchName: string;
+  documentCount: number;
+  status: 'Pendiente de Retiro';
+};
+
+// Estructura para las rutas
+export type Route = {
+  id: string;
+  routeName: string;
+  courierId: string;
+  courierName: string;
+  date: string;
+  status: 'Planificada' | 'En Progreso' | 'Completada';
+  stops: {
+    branchId: string;
+    branchName: string;
+    address: string;
+    pickups: PendingPickup[];
+  }[];
+};
+
 
 // Lista de usuarios de ejemplo.
 export const users: User[] = [
@@ -62,20 +98,77 @@ export const volunteers: Volunteer[] = [
 export const branches: Branch[] = [
     { id: 'BRH001', name: 'Oficina Central', address: '123 Main St, Cityville', manager: 'Ricardo Gomes' },
     { id: 'BRH002', name: 'Sucursal Norte', address: '456 North Ave, Townburg', manager: 'Helena Souza' },
+    { id: 'BRH003', name: 'Sucursal Este', address: '789 East Blvd, Villatown', manager: 'Mario Vega' },
 ];
 
 // Lista de casos de ejemplo.
 export const cases: Case[] = [
-  { id: 'CAS001', title: 'Amparo Constitucional vs. Estado', clientName: 'Ana Silva', assignedTo: 'Eduardo Martins', status: 'En Progreso', lastUpdate: '2023-11-01', category: 'Contenciosa', opportunityLifecycle: 75 },
+  { id: 'CAS001', title: 'Amparo Constitucional vs. Estado', clientName: 'Ana Silva', assignedTo: 'Eduardo Martins', status: 'Sentencia', lastUpdate: '2023-11-01', category: 'Contenciosa', opportunityLifecycle: 90 },
   { id: 'CAS002', title: 'Resolución de Disputa de Propiedad', clientName: 'John Doe', assignedTo: 'Fernanda Lima', status: 'Abierto', lastUpdate: '2023-10-30', category: 'No Contenciosa', opportunityLifecycle: 25 },
   { id: 'CAS003', title: 'Reclamo de Derechos Laborales', clientName: 'Jane Smith', assignedTo: 'Eduardo Martins', status: 'Cerrado', lastUpdate: '2023-09-15', category: 'Contenciosa', opportunityLifecycle: 100 },
-  { id: 'CAS004', title: 'Procedimiento de Divorcio', clientName: 'Bruno Costa', assignedTo: 'Gabriel Rocha', status: 'En Espera', lastUpdate: '2023-11-05', category: 'No Contenciosa', opportunityLifecycle: 50 },
+  { id: 'CAS004', title: 'Procedimiento de Divorcio', clientName: 'Bruno Costa', assignedTo: 'Gabriel Rocha', status: 'Sentencia', lastUpdate: '2023-11-05', category: 'No Contenciosa', opportunityLifecycle: 95 },
 ];
 
 // Lista de notificaciones de ejemplo.
 export const notifications = [
     { id: 1, text: 'Nueva oportunidad "Carla Dias" registrada.', time: 'hace 10 min', read: false },
-    { id: 2, text: 'El estado del caso #CAS001 se actualizó a "En Progreso".', time: 'hace 1 hora', read: false },
+    { id: 2, text: 'El estado del caso #CAS001 se actualizó a "Sentencia".', time: 'hace 1 hora', read: false },
     { id: 3, text: 'La voluntaria "Fernanda Lima" acaba de registrarse.', time: 'hace 3 horas', read: true },
     { id: 4, text: 'Se ha subido un documento para el caso #CAS002.', time: 'hace 1 día', read: true },
+    { id: 5, text: 'Documentos para caso #CAS004 listos para retirar en Sucursal Norte.', time: 'hace 2 días', read: true },
+];
+
+// Lista de mensajeros
+export const couriers: Courier[] = [
+  { id: 'COUR01', name: 'Carlos Jimenez', phone: '8888-1111', vehicle: 'Motocicleta' },
+  { id: 'COUR02', name: 'Luisa Fernandez', phone: '8888-2222', vehicle: 'Automóvil' },
+];
+
+// Lista de recogidas pendientes
+export const pendingPickups: PendingPickup[] = [
+  { id: 'PICK01', caseId: 'CAS001', clientName: 'Ana Silva', branchId: 'BRH002', branchName: 'Sucursal Norte', documentCount: 3, status: 'Pendiente de Retiro' },
+  { id: 'PICK02', caseId: 'CAS004', clientName: 'Bruno Costa', branchId: 'BRH003', branchName: 'Sucursal Este', documentCount: 2, status: 'Pendiente de Retiro' },
+  { id: 'PICK03', caseId: 'CAS005', clientName: 'Otro Cliente', branchId: 'BRH002', branchName: 'Sucursal Norte', documentCount: 1, status: 'Pendiente de Retiro' },
+];
+
+// Lista de rutas planificadas
+export const routes: Route[] = [
+  {
+    id: 'RUTA-20231110-01',
+    routeName: 'Ruta Matutina GAM',
+    courierId: 'COUR01',
+    courierName: 'Carlos Jimenez',
+    date: '2023-11-10',
+    status: 'Planificada',
+    stops: [
+      {
+        branchId: 'BRH002',
+        branchName: 'Sucursal Norte',
+        address: '456 North Ave, Townburg',
+        pickups: pendingPickups.filter(p => p.branchId === 'BRH002')
+      },
+      {
+        branchId: 'BRH003',
+        branchName: 'Sucursal Este',
+        address: '789 East Blvd, Villatown',
+        pickups: pendingPickups.filter(p => p.branchId === 'BRH003')
+      }
+    ]
+  },
+  {
+    id: 'RUTA-20231109-02',
+    routeName: 'Ruta Vespertina Central',
+    courierId: 'COUR02',
+    courierName: 'Luisa Fernandez',
+    date: '2023-11-09',
+    status: 'Completada',
+    stops: [
+        {
+            branchId: 'BRH001',
+            branchName: 'Oficina Central',
+            address: '123 Main St, Cityville',
+            pickups: []
+        }
+    ]
+  }
 ];
