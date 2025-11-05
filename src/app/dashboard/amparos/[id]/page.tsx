@@ -111,6 +111,10 @@ import {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
+                  <h3 className="font-medium">Especialidad</h3>
+                  <p className="text-muted-foreground">{caseItem.specialty}</p>
+                </div>
+                <div>
                   <h3 className="font-medium">Abogado Asignado</h3>
                   <p className="text-muted-foreground">{caseItem.assignedTo}</p>
                 </div>

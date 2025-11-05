@@ -39,6 +39,7 @@ export type Case = {
   status: 'Abierto' | 'En Progreso' | 'En Espera' | 'Cerrado' | 'Sentencia'; // Estado actual del caso.
   lastUpdate: string; // Fecha de la última actualización.
   category: 'Contenciosa' | 'No Contenciosa'; // Categoría del caso.
+  specialty: string; // Especialidad médica del amparo.
   opportunityLifecycle: number; // Porcentaje de progreso del ciclo de vida.
 };
 
@@ -105,10 +106,10 @@ export const branches: Branch[] = [
 
 // Lista de casos de ejemplo.
 export const cases: Case[] = [
-  { id: 'CAS001', title: 'Amparo Constitucional vs. Estado', clientName: 'Ana Silva', assignedTo: 'Eduardo Martins', status: 'Sentencia', lastUpdate: '2023-11-01', category: 'Contenciosa', opportunityLifecycle: 90 },
-  { id: 'CAS002', title: 'Resolución de Disputa de Propiedad', clientName: 'John Doe', assignedTo: 'Fernanda Lima', status: 'Abierto', lastUpdate: '2023-10-30', category: 'No Contenciosa', opportunityLifecycle: 25 },
-  { id: 'CAS003', title: 'Reclamo de Derechos Laborales', clientName: 'Jane Smith', assignedTo: 'Eduardo Martins', status: 'Cerrado', lastUpdate: '2023-09-15', category: 'Contenciosa', opportunityLifecycle: 100 },
-  { id: 'CAS004', title: 'Procedimiento de Divorcio', clientName: 'Bruno Costa', assignedTo: 'Gabriel Rocha', status: 'Sentencia', lastUpdate: '2023-11-05', category: 'No Contenciosa', opportunityLifecycle: 95 },
+  { id: 'CAS001', title: 'Lista de espera por cirugía vs. CCSS', clientName: 'Ana Silva', assignedTo: 'Eduardo Martins', status: 'Sentencia', lastUpdate: '2023-11-01', category: 'Contenciosa', specialty: 'Cirugía General', opportunityLifecycle: 90 },
+  { id: 'CAS002', title: 'Cita a largo plazo para radiología vs. CCSS', clientName: 'John Doe', assignedTo: 'Fernanda Lima', status: 'Abierto', lastUpdate: '2023-10-30', category: 'No Contenciosa', specialty: 'Radiología', opportunityLifecycle: 25 },
+  { id: 'CAS003', title: 'Falta de medicamentos vs. CCSS', clientName: 'Jane Smith', assignedTo: 'Eduardo Martins', status: 'Cerrado', lastUpdate: '2023-09-15', category: 'Contenciosa', specialty: 'Farmacia', opportunityLifecycle: 100 },
+  { id: 'CAS004', title: 'Lista de espera para cardiología vs. CCSS', clientName: 'Bruno Costa', assignedTo: 'Gabriel Rocha', status: 'Sentencia', lastUpdate: '2023-11-05', category: 'No Contenciosa', specialty: 'Cardiología', opportunityLifecycle: 95 },
 ];
 
 // Lista de notificaciones de ejemplo.

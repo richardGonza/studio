@@ -116,6 +116,7 @@ function CasesTable({ cases }: { cases: Case[] }) {
                 <TableRow>
                 <TableHead>Título del Amparo</TableHead>
                 <TableHead className="hidden md:table-cell">Cliente</TableHead>
+                <TableHead className="hidden md:table-cell">Especialidad</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="hidden lg:table-cell">Ciclo de Vida</TableHead>
                 <TableHead className="hidden md:table-cell">Última Actualización</TableHead>
@@ -135,6 +136,7 @@ function CasesTable({ cases }: { cases: Case[] }) {
                       <div className="text-sm text-muted-foreground">{caseItem.id}</div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">{caseItem.clientName}</TableCell>
+                    <TableCell className="hidden md:table-cell">{caseItem.specialty}</TableCell>
                     <TableCell>
                     {/* Usamos la función getStatusVariant para darle color al estado. */}
                     <Badge variant={getStatusVariant(caseItem.status)}>{caseItem.status}</Badge>
