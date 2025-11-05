@@ -50,7 +50,7 @@ const getStatusVariant = (status: string) => {
 
 // Esta es la función principal que define la página de Casos.
 export default function AmparosMepPage() {
-  const amparosMep = cases.filter(c => c.title.includes('MEP'));
+  const amparosMep = cases.filter(c => c.title && c.title.includes('MEP'));
   // La página utiliza un sistema de pestañas (Tabs) para filtrar los casos.
   return (
     <Tabs defaultValue="all">

@@ -50,7 +50,7 @@ const getStatusVariant = (status: string) => {
 
 // Esta es la función principal que define la página de Casos.
 export default function CasesPage() {
-  const amparosCCSS = cases.filter(c => c.title.includes('CCSS'));
+  const amparosCCSS = cases.filter(c => c.title && c.title.includes('CCSS'));
   // La página utiliza un sistema de pestañas (Tabs) para filtrar los casos.
   return (
     <Tabs defaultValue="all">
