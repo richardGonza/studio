@@ -21,6 +21,7 @@ import {
   Route,
   School,
   PlayCircle,
+  MessageSquare,
 } from "lucide-react";
 
 // Definimos los elementos de nuestro menú de navegación en un array.
@@ -34,6 +35,7 @@ const navItems = [
   { href: "/dashboard/amparos-mep", icon: School, label: "Amparos MEP" },
   { href: "/dashboard/ejecuciones", icon: PlayCircle, label: "Ejecuciones" },
   { href: "/dashboard/rutas", icon: Route, label: "Rutas" },
+  { href: "/dashboard/comunicaciones", icon: MessageSquare, label: "Comunicaciones" },
 ];
 
 // Esta es la función que crea el componente de navegación del dashboard.
