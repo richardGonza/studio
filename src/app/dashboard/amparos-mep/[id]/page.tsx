@@ -13,6 +13,7 @@ import {
   MessageSquare,
   PanelRightClose,
   PanelRightOpen,
+  ClipboardCheck,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -25,10 +26,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cases } from "@/lib/data";
+import { cases, tasks, staff, Task } from "@/lib/data";
 import { CaseChat } from "@/components/case-chat";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Datos de ejemplo para los archivos y mensajes.
 const files = [
@@ -48,6 +50,50 @@ const getFileIcon = (type: string) => {
       return <FileArchive className="h-6 w-6 text-muted-foreground" />;
   }
 };
+
+const getPriorityVariant = (priority: Task['priority']) => {
+    switch (priority) {
+        case 'Alta': return 'destructive';
+        case 'Media': return 'default';
+        case 'Baja': return 'secondary';
+        default: return 'outline';
+    }
+}
+
+function CaseTasks({ caseId }: { caseId: string }) {
+    const caseTasks = tasks.filter(task => task.caseId === caseId);
+
+    const getAvatarUrl = (name: string) => {
+        const user = staff.find(s => s.name === name);
+        return user ? user.avatarUrl : undefined;
+    };
+
+    if (caseTasks.length === 0) {
+        return <div className="text-center text-sm text-muted-foreground p-4">No hay tareas para este caso.</div>
+    }
+
+    return (
+        <div className="space-y-3 p-2">
+            {caseTasks.map(task => (
+                <div key={task.id} className="border p-3 rounded-lg bg-muted/50">
+                    <div className="flex justify-between items-start">
+                        <p className="font-medium text-sm">{task.title}</p>
+                        <Badge variant={getPriorityVariant(task.priority)}>{task.priority}</Badge>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+                        <Avatar className="h-5 w-5">
+                            <AvatarImage src={getAvatarUrl(task.assignedTo)} />
+                            <AvatarFallback>{task.assignedTo.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span>{task.assignedTo}</span>
+                        <span>-</span>
+                        <span>Vence: {task.dueDate}</span>
+                    </div>
+                </div>
+            ))}
+        </div>
+    )
+}
 
 // Esta es la página de detalle de un caso específico.
 export default function AmparoMepDetailPage({
@@ -95,7 +141,7 @@ export default function AmparoMepDetailPage({
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>{isChatVisible ? 'Ocultar Chat' : 'Mostrar Chat'}</p>
+                    <p>{isChatVisible ? 'Ocultar Panel' : 'Mostrar Panel'}</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
@@ -216,10 +262,24 @@ export default function AmparoMepDetailPage({
         {isChatVisible && (
             <div className="lg:col-span-2 space-y-6">
                 <Card className="h-[calc(100vh-12rem)]">
-                    <CardHeader>
-                        <CardTitle>Chat del Caso: {caseItem.id}</CardTitle>
-                    </CardHeader>
-                    <CaseChat conversationId="CONV02" />
+                    <Tabs defaultValue="comunicaciones" className="flex flex-col h-full">
+                         <TabsList className="m-2">
+                            <TabsTrigger value="comunicaciones" className="gap-1">
+                                <MessageSquare className="h-4 w-4"/>
+                                Comunicaciones
+                            </TabsTrigger>
+                            <TabsTrigger value="tareas" className="gap-1">
+                                <ClipboardCheck className="h-4 w-4"/>
+                                Tareas
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="comunicaciones" className="flex-1 overflow-y-auto">
+                            <CaseChat conversationId="CONV02" />
+                        </TabsContent>
+                         <TabsContent value="tareas" className="flex-1 overflow-y-auto">
+                            <CaseTasks caseId={caseItem.id} />
+                        </TabsContent>
+                    </Tabs>
                 </Card>
             </div>
         )}

@@ -28,6 +28,7 @@ import {
   CircleDollarSign,
   Bell,
   ClipboardCheck,
+  FolderKanban,
 } from "lucide-react";
 
 // Definimos los elementos de nuestro menú de navegación en un array.
@@ -40,6 +41,7 @@ const navItems = [
   { href: "/dashboard/volunteers", icon: Handshake, label: "Voluntarios" },
   { href: "/dashboard/branches", icon: Building, label: "Puntos Autorizados" },
   { href: "/dashboard/rutas", icon: Route, label: "Rutas" },
+  { href: "/dashboard/cases", icon: FolderKanban, label: "Casos" },
   { href: "/dashboard/amparos", icon: Gavel, label: "Amparos" },
   { href: "/dashboard/amparos-mep", icon: School, label: "Amparos MEP" },
   { href: "/dashboard/ejecuciones", icon: PlayCircle, label: "Ejecuciones" },
