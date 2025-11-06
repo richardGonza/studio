@@ -9,6 +9,7 @@ import {
     FileJson,
     BookUser,
     Shield,
+    MessageSquare,
   } from "lucide-react";
   import Link from "next/link";
   import {
@@ -21,8 +22,6 @@ import {
   } from "@/components/ui/card";
   import { Button } from "@/components/ui/button";
   import { Badge } from "@/components/ui/badge";
-  import { Textarea } from "@/components/ui/textarea";
-  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
   import { cases } from "@/lib/data";
   
   // Datos de ejemplo para los archivos y mensajes.
@@ -74,9 +73,9 @@ import {
         </div>
   
         {/* Grid para organizar las tarjetas de información. */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-          {/* Columna principal con detalles de la ejecución y pruebas (60%) */}
-          <div className="space-y-6 lg:col-span-5">
+        <div className="grid grid-cols-1 gap-6">
+          {/* Columna principal con detalles de la ejecución y pruebas */}
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -85,9 +84,17 @@ import {
                         <CardTitle>Ejecución de Sentencia {caseItem.id}</CardTitle>
                         <CardDescription>Cliente: {caseItem.clientName}</CardDescription>
                     </div>
-                    <Badge variant={caseItem.status === 'Cerrado' ? 'destructive' : 'default'}>
-                        {caseItem.status}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href="/dashboard/comunicaciones">
+                                <MessageSquare className="mr-2 h-4 w-4"/>
+                                Abrir Chat
+                            </Link>
+                        </Button>
+                        <Badge variant={caseItem.status === 'Cerrado' ? 'destructive' : 'default'}>
+                            {caseItem.status}
+                        </Badge>
+                    </div>
                 </div>
               </CardHeader>
               <CardContent className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">

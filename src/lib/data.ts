@@ -120,16 +120,26 @@ export type Conversation = {
     status: 'Abierto' | 'Resuelto';
   };
   
-  // Estructura para mensajes de chat del helpdesk
-  export type ChatMessage = {
-    id: string;
-    conversationId: string;
-    senderType: 'client' | 'agent';
-    senderName: string;
-    avatarUrl: string;
-    text: string;
-    time: string;
-  };
+// Estructura para mensajes de chat del helpdesk
+export type ChatMessage = {
+id: string;
+conversationId: string;
+senderType: 'client' | 'agent';
+senderName: string;
+avatarUrl: string;
+text: string;
+time: string;
+};
+
+// Estructura para notas internas
+export type InternalNote = {
+id: string;
+conversationId: string;
+senderName: string;
+avatarUrl: string;
+text: string;
+time: string;
+};
 
 // Lista de usuarios de ejemplo (Leads).
 export const users: User[] = [
@@ -270,4 +280,11 @@ export const chatMessages: ChatMessage[] = [
     { id: 'MSG03', conversationId: 'CONV01', senderType: 'client', senderName: 'Ana Silva Rojas', avatarUrl: 'https://picsum.photos/seed/avatar1/40/40', text: 'Perfecto, quedo a la espera. Muchas gracias.', time: '10:15 AM' },
     { id: 'MSG04', conversationId: 'CONV02', senderType: 'client', senderName: 'Bruno Costa Marin', avatarUrl: 'https://picsum.photos/seed/avatar2/40/40', text: 'Hola, ¿podrían confirmarme la recepción de los documentos que envié ayer?', time: '9:30 AM' },
     { id: 'MSG05', conversationId: 'CONV02', senderType: 'agent', senderName: 'Jorge Ortiz', avatarUrl: 'https://picsum.photos/seed/staff1/40/40', text: 'Buenos días Bruno, sí, los recibimos correctamente. Ya están siendo procesados.', time: '9:35 AM' },
+];
+
+// Datos de ejemplo para las notas internas
+export const internalNotes: InternalNote[] = [
+    { id: 'NOTE01', conversationId: 'CONV01', senderName: 'Raizza Mildrey', avatarUrl: 'https://picsum.photos/seed/staff2/40/40', text: 'Ojo, revisar el documento "Prueba_Contrato.pdf". Parece que falta una firma.', time: '10:12 AM' },
+    { id: 'NOTE02', conversationId: 'CONV01', senderName: 'Carolina Chavarría', avatarUrl: 'https://picsum.photos/seed/staff5/40/40', text: 'Confirmado, voy a contactar a la cliente para solicitarle el documento firmado.', time: '10:20 AM' },
+    { id: 'NOTE03', conversationId: 'CONV02', senderName: 'Jorge Ortiz', avatarUrl: 'https://picsum.photos/seed/staff1/40/40', text: 'Este caso del MEP parece complejo. Richard, ¿podrías darle un vistazo?', time: '9:40 AM' },
 ];
