@@ -18,10 +18,11 @@ import type { ChartConfig } from '@/components/ui/chart';
 
 // Datos para el gráfico de barras. Contamos cuántos casos hay en cada estado.
 const chartData = [
-  { status: 'Abierto', count: cases.filter(c => c.status === 'Open').length },
-  { status: 'En Progreso', count: cases.filter(c => c.status === 'In Progress').length },
-  { status: 'En Espera', count: cases.filter(c => c.status === 'On Hold').length },
-  { status: 'Cerrado', count: cases.filter(c => c.status === 'Closed').length },
+  { status: 'Abierto', count: cases.filter(c => c.status === 'Abierto').length },
+  { status: 'En Progreso', count: cases.filter(c => c.status === 'En Progreso').length },
+  { status: 'En Espera', count: cases.filter(c => c.status === 'En Espera').length },
+  { status: 'Cerrado', count: cases.filter(c => c.status === 'Cerrado').length },
+  { status: 'Sentencia', count: cases.filter(c => c.status === 'Sentencia').length },
 ];
 
 // Configuración para el gráfico, como la etiqueta y el color de las barras.
@@ -55,7 +56,7 @@ export default function DashboardPage() {
             <Gavel className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{cases.filter(c => c.status !== 'Closed').length}</div>
+            <div className="text-2xl font-bold">{cases.filter(c => c.status !== 'Cerrado').length}</div>
             <p className="text-xs text-muted-foreground">+3 esta semana</p>
           </CardContent>
         </Card>
