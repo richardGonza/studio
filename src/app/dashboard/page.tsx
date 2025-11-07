@@ -1,4 +1,5 @@
 // Este es un Componente de Servidor, se renderiza en el servidor para mayor rendimiento.
+'use client';
 import {
   Bar,
   BarChart,
@@ -53,6 +54,33 @@ const chartConfig = {
     color: 'hsl(var(--chart-1))',
   },
 } satisfies ChartConfig;
+
+
+function CreditStatusChart() {
+    return (
+        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+            <BarChart accessibilityLayer data={chartData}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+                dataKey="status"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+            />
+            <YAxis />
+            <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
+            />
+            <Bar
+                dataKey="count"
+                fill="var(--color-count)"
+                radius={[4, 4, 0, 0]}
+            />
+            </BarChart>
+        </ChartContainer>
+    );
+}
 
 /**
  * Componente principal de la página del Dashboard (Panel Principal).
@@ -141,27 +169,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             {/* Contenedor del gráfico que lo hace responsivo. */}
-            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-              <BarChart accessibilityLayer data={chartData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="status"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                />
-                <YAxis />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent />}
-                />
-                <Bar
-                  dataKey="count"
-                  fill="var(--color-count)"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ChartContainer>
+            <CreditStatusChart />
           </CardContent>
         </Card>
         {/* Tarjeta de Actividad Reciente */}
@@ -214,5 +222,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
