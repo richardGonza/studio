@@ -35,9 +35,10 @@ function InvestmentDetailClient({ id }: { id: string }) {
     );
   }
 
-  const [rate, setRate] = useState(investment.rate?.toString() ?? '');
+  const [rate, setRate] = useState(investment.rate?.toString() ?? '7.05');
   
-  const retentionAmount = investment.amount * 0.15;
+  const annualInterest = investment.amount * (parseFloat(rate) / 100);
+  const retentionAmount = annualInterest * 0.15;
 
   return (
     <div className="space-y-6">
@@ -121,10 +122,11 @@ function InvestmentDetailClient({ id }: { id: string }) {
                 </div>
             </div>
             <div className="grid gap-1">
-                <h3 className="font-medium">Retención (15%)</h3>
+                <h3 className="font-medium">Retención Anual Proyectada (15%)</h3>
                  <p className="font-mono text-destructive">
                     - {new Intl.NumberFormat('es-CR', { style: 'currency', currency: investment.currency }).format(retentionAmount)}
                 </p>
+                <p className="text-xs text-muted-foreground">Sobre un interés anual de {new Intl.NumberFormat('es-CR', { style: 'currency', currency: investment.currency }).format(annualInterest)}</p>
             </div>
           </CardContent>
         </Card>
@@ -149,3 +151,5 @@ function InvestmentDetailClient({ id }: { id: string }) {
 export default function InvestmentDetailPage({ params }: { params: { id: string } }) {
   return <InvestmentDetailClient id={params.id} />
 }
+
+    

@@ -22,6 +22,7 @@ import {
   UserCheck,
   Activity,
   CircleDollarSign,
+  FileDown,
 } from 'lucide-react';
 import { credits, notifications, clients, opportunities } from '@/lib/data'; // Importamos los datos de ejemplo.
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -31,6 +32,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import type { ChartConfig } from '@/components/ui/chart';
+import { Button } from '@/components/ui/button';
 
 // Preparación de los datos para el gráfico de barras.
 // Contamos la cantidad de créditos por cada estado.
@@ -192,6 +194,25 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid gap-6">
+        <Card>
+            <CardHeader>
+                <CardTitle>Reportes</CardTitle>
+                <CardDescription>
+                Genera reportes para análisis y contabilidad.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <Button>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Generar Reporte de Retenciones
+                </Button>
+            </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
+
+    

@@ -6,7 +6,7 @@ import {
   Home,
   ChevronRight,
   Search,
-  User as UserIcon,
+  User,
   LogOut,
   Settings,
 } from 'lucide-react';
@@ -161,7 +161,7 @@ export function DashboardHeader() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <UserIcon className="mr-2 h-4 w-4" />
+              <User className="mr-2 h-4 w-4" />
               <span>Perfil</span>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>

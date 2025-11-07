@@ -336,9 +336,9 @@ export const credits: Credit[] = [
 ];
 
 export const investments: Investment[] = [
-    { investmentNumber: 'INV-001', investorName: 'Ricardo Vega', investorId: '2-0876-5432', startDate: '2023-01-15', endDate: '2025-01-15', amount: 10000000, currency: 'CRC', rate: 12, interestFrequency: 'Mensual', isCapitalizable: false, status: 'Activa' },
-    { investmentNumber: 'INV-002', investorName: 'Laura Montes', investorId: '1-0987-6543', startDate: '2023-03-01', endDate: '2024-03-01', amount: 50000, currency: 'USD', rate: 8, interestFrequency: 'Trimestral', isCapitalizable: true, status: 'Activa' },
-    { investmentNumber: 'INV-003', investorName: 'Ricardo Vega', investorId: '2-0876-5432', startDate: '2022-05-20', endDate: '2023-05-20', amount: 5000000, currency: 'CRC', rate: 10, interestFrequency: 'Anual', isCapitalizable: false, status: 'Finalizada' },
+    { investmentNumber: 'INV-001', investorName: 'Ricardo Vega', investorId: '2-0876-5432', startDate: '2023-01-15', endDate: '2025-01-15', amount: 10000000, currency: 'CRC', rate: 7.05, interestFrequency: 'Mensual', isCapitalizable: false, status: 'Activa' },
+    { investmentNumber: 'INV-002', investorName: 'Laura Montes', investorId: '1-0987-6543', startDate: '2023-03-01', endDate: '2024-03-01', amount: 50000, currency: 'USD', rate: 7.05, interestFrequency: 'Trimestral', isCapitalizable: true, status: 'Activa' },
+    { investmentNumber: 'INV-003', investorName: 'Ricardo Vega', investorId: '2-0876-5432', startDate: '2022-05-20', endDate: '2023-05-20', amount: 5000000, currency: 'CRC', rate: 7.05, interestFrequency: 'Anual', isCapitalizable: false, status: 'Finalizada' },
 ];
 
 export const notifications = [
@@ -478,3 +478,5 @@ export const salesGoals: SalesGoal[] = [
   { id: 'GOAL02', salespersonId: 'STF002', salespersonName: 'Raizza Mildrey Arocena', salespersonAvatar: 'https://picsum.photos/seed/staff2/40/40', month: 'Noviembre 2023', goalAmount: 40000000, achievedAmount: 31000000 },
 ];
 
+
+    
