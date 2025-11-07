@@ -36,6 +36,17 @@ export type Client = {
     avatarUrl: string;
 };
 
+export type Investor = {
+  id: string;
+  name: string;
+  cedula: string;
+  email: string;
+  phone: string;
+  status: 'Activo' | 'Inactivo';
+  activeInvestments: number;
+  registeredOn: string;
+  avatarUrl: string;
+};
 
 export type Opportunity = {
   id: string;
@@ -65,6 +76,19 @@ export type Credit = {
   creationDate: string;
   dueDate: string;
   expediente?: string;
+};
+
+export type Investment = {
+  investmentNumber: string;
+  investorName: string;
+  investorId: string;
+  startDate: string;
+  endDate: string;
+  amount: number;
+  currency: 'CRC' | 'USD';
+  interestFrequency: 'Mensual' | 'Trimestral' | 'Semestral' | 'Anual';
+  isCapitalizable: boolean;
+  status: 'Activa' | 'Finalizada' | 'Liquidada';
 };
 
 
@@ -272,7 +296,13 @@ export const clients: Client[] = [
     { id: 'USR019', name: 'Gabriela Vargas', cedula: '1-7777-8888', email: 'gabriela.v@example.com', phone: '4433-2211', clientStatus: 'En cobro', activeCredits: 1, registeredOn: '2022-05-21', avatarUrl: 'https://picsum.photos/seed/avatarGV/40/40'},
     { id: 'USR020', name: 'Bruno Costa Marin', cedula: '2-0987-6543', email: 'bruno.costa@example.com', phone: '6123-4567', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-10-25', avatarUrl: 'https://picsum.photos/seed/avatar2/40/40' },
 ];
-  
+
+export const investors: Investor[] = [
+    { id: 'INV001', name: 'Laura Montes', cedula: '1-0987-6543', email: 'laura.montes@inversion.com', phone: '8888-9999', status: 'Activo', activeInvestments: 1, registeredOn: '2022-08-15', avatarUrl: 'https://picsum.photos/seed/investor1/40/40' },
+    { id: 'INV002', name: 'Ricardo Vega', cedula: '2-0876-5432', email: 'ricardo.vega@inversion.com', phone: '7777-6666', status: 'Activo', activeInvestments: 2, registeredOn: '2023-01-20', avatarUrl: 'https://picsum.photos/seed/investor2/40/40' },
+    { id: 'INV003', name: 'Elena Solis', cedula: '3-0765-4321', email: 'elena.solis@inversion.com', phone: '6666-5555', status: 'Inactivo', activeInvestments: 0, registeredOn: '2021-11-30', avatarUrl: 'https://picsum.photos/seed/investor3/40/40' },
+];
+
 export const opportunities: Opportunity[] = [
     { id: 'OPP001', leadCedula: '2-0987-6543', creditType: 'Regular', amount: 5000000, status: 'En proceso', startDate: '2023-11-01', assignedTo: 'Raizza Mildrey Arocena' },
     { id: 'OPP002', leadCedula: '5-3333-4444', creditType: 'Micro-crédito', amount: 500000, status: 'Convertido', startDate: '2023-11-02', assignedTo: 'Jorge Ortiz Solís' },
@@ -302,6 +332,12 @@ export const credits: Credit[] = [
     { operationNumber: 'MC-004', debtorName: 'Bruno Costa Marin', debtorId: '2-0987-6543', employer: 'Ministerio de Educación Pública', type: 'Micro-crédito', amount: 690000, balance: 690000, fee: 70000, rate: 24, term: 12, status: 'Al día', overdueFees: 0, daysInArrears: 0, creationDate: '2023-11-02', dueDate: '2024-11-02', deductingEntity: 'CoopeAnde' },
     { operationNumber: 'MC-005', debtorName: 'Peter Jones', debtorId: '8-6666-7777', employer: 'Ministerio de Educación Pública', type: 'Micro-crédito', amount: 300000, balance: 0, fee: 30000, rate: 24, term: 12, status: 'Cancelado', overdueFees: 0, creationDate: '2021-05-10', dueDate: '2022-05-10', deductingEntity: 'CoopeAnde' },
     { operationNumber: 'MC-006', debtorName: 'Ana Silva Rojas', debtorId: '1-1234-5678', employer: 'Caja Costarricense de Seguro Social', type: 'Micro-crédito', amount: 550000, balance: 50000, fee: 55000, rate: 25, term: 12, status: 'En mora', overdueFees: 3, daysInArrears: 70, creationDate: '2023-02-01', dueDate: '2024-02-01', deductingEntity: 'CS Magisterio' },
+];
+
+export const investments: Investment[] = [
+    { investmentNumber: 'INV-001', investorName: 'Ricardo Vega', investorId: '2-0876-5432', startDate: '2023-01-15', endDate: '2025-01-15', amount: 10000000, currency: 'CRC', interestFrequency: 'Mensual', isCapitalizable: false, status: 'Activa' },
+    { investmentNumber: 'INV-002', investorName: 'Laura Montes', investorId: '1-0987-6543', startDate: '2023-03-01', endDate: '2024-03-01', amount: 50000, currency: 'USD', interestFrequency: 'Trimestral', isCapitalizable: true, status: 'Activa' },
+    { investmentNumber: 'INV-003', investorName: 'Ricardo Vega', investorId: '2-0876-5432', startDate: '2022-05-20', endDate: '2023-05-20', amount: 5000000, currency: 'CRC', interestFrequency: 'Anual', isCapitalizable: false, status: 'Finalizada' },
 ];
 
 export const notifications = [
