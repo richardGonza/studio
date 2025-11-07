@@ -1,9 +1,4 @@
 
-
-
-
-
-
 export type User = {
   id: string;
   name: string;
@@ -45,7 +40,7 @@ export type Opportunity = {
   leadCedula: string;
   creditType: 'Regular' | 'Micro-crédito';
   amount: number;
-  status: 'Nuevo' | 'Contactado' | 'Análisis' | 'Aprobado' | 'Rechazado' | 'Convertido';
+  status: 'En proceso' | 'Rechazada' | 'Aceptada' | 'Convertido';
   startDate: string;
   assignedTo: string;
 };
@@ -241,8 +236,10 @@ export const clients: Client[] = [
 ];
   
 export const opportunities: Opportunity[] = [
-    { id: 'OPP001', leadCedula: '2-0987-6543', creditType: 'Regular', amount: 5000000, status: 'Análisis', startDate: '2023-11-01', assignedTo: 'Raizza Mildrey Arocena' },
+    { id: 'OPP001', leadCedula: '2-0987-6543', creditType: 'Regular', amount: 5000000, status: 'En proceso', startDate: '2023-11-01', assignedTo: 'Raizza Mildrey Arocena' },
     { id: 'OPP002', leadCedula: '5-3333-4444', creditType: 'Micro-crédito', amount: 500000, status: 'Convertido', startDate: '2023-11-02', assignedTo: 'Jorge Ortiz Solís' },
+    { id: 'OPP003', leadCedula: '3-1111-2222', creditType: 'Regular', amount: 2000000, status: 'Rechazada', startDate: '2023-11-03', assignedTo: 'Raizza Mildrey Arocena' },
+    { id: 'OPP004', leadCedula: '4-2222-3333', creditType: 'Regular', amount: 7000000, status: 'Aceptada', startDate: '2023-11-04', assignedTo: 'Jorge Ortiz Solís' },
 ];
 
 export const credits: Credit[] = [
@@ -394,4 +391,3 @@ export const deductoras: Deductora[] = [
   { id: 'DED004', name: 'CS Magisterio', paymentDate: 'Quincenal (12 y 27)', commission: 2.0 },
   { id: 'DED005', name: 'CoopeJudicial', paymentDate: 'Mensual (día 22)', commission: 1.0 },
 ];
-

@@ -25,7 +25,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 // Importamos los datos de ejemplo para las oportunidades.
-import { opportunities } from "@/lib/data";
+import { opportunities, Opportunity } from "@/lib/data";
+
+const getStatusVariant = (status: Opportunity['status']) => {
+    switch (status) {
+        case 'Convertido': return 'default';
+        case 'Aceptada': return 'default';
+        case 'En proceso': return 'secondary';
+        case 'Rechazada': return 'destructive';
+        default: return 'outline';
+    }
+}
+
 
 // Esta es la función principal que define la página de Oportunidades.
 export default function DealsPage() {
@@ -71,7 +82,7 @@ export default function DealsPage() {
                 </TableCell>
                 <TableCell>{opportunity.creditType}</TableCell>
                 <TableCell>
-                  <Badge variant={opportunity.status === 'Convertido' ? 'default' : 'secondary'}>{opportunity.status}</Badge>
+                  <Badge variant={getStatusVariant(opportunity.status)}>{opportunity.status}</Badge>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">{opportunity.startDate}</TableCell>
                 <TableCell className="hidden md:table-cell">{opportunity.assignedTo}</TableCell>
