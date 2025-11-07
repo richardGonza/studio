@@ -1,6 +1,6 @@
 'use client';
 
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,6 +29,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { credits, Credit } from '@/lib/data';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { DateRange } from 'react-day-picker';
+import { format } from 'date-fns';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 const getStatusVariant = (status: Credit['status']) => {
   switch (status) {
@@ -46,12 +52,27 @@ const getStatusVariant = (status: Credit['status']) => {
 export default function CreditsPage() {
   const searchParams = useSearchParams();
   const debtorId = searchParams.get('debtorId');
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
 
-  const filteredCredits = debtorId
+  const baseFilteredCredits = debtorId
     ? credits.filter((c) => c.debtorId === debtorId)
     : credits;
 
-  const pageTitle = debtorId ? `Créditos de ${filteredCredits[0]?.debtorName}` : 'Todos los Créditos';
+  const filteredCredits = baseFilteredCredits.filter(credit => {
+    if (!date?.from) return true;
+    const creditDate = new Date(credit.creationDate);
+    const from = new Date(date.from);
+    from.setHours(0,0,0,0);
+    
+    if (!date.to) {
+        return creditDate >= from;
+    }
+    const to = new Date(date.to);
+    to.setHours(23,59,59,999);
+    return creditDate >= from && creditDate <= to;
+  })
+
+  const pageTitle = debtorId ? `Créditos de ${filteredCredits[0]?.debtorName || ''}` : 'Todos los Créditos';
   const pageDescription = debtorId ? `Viendo todos los créditos para el cliente.` : 'Gestiona todos los créditos activos e históricos.';
 
   return (
@@ -78,8 +99,51 @@ export default function CreditsPage() {
       <TabsContent value="all">
         <Card>
           <CardHeader>
-            <CardTitle>{pageTitle}</CardTitle>
-            <CardDescription>{pageDescription}</CardDescription>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <CardTitle>{pageTitle}</CardTitle>
+                    <CardDescription>{pageDescription}</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <Button
+                            id="date"
+                            variant={"outline"}
+                            className={cn(
+                            "w-[300px] justify-start text-left font-normal",
+                            !date && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date?.from ? (
+                            date.to ? (
+                                <>
+                                {format(date.from, "LLL dd, y")} -{" "}
+                                {format(date.to, "LLL dd, y")}
+                                </>
+                            ) : (
+                                format(date.from, "LLL dd, y")
+                            )
+                            ) : (
+                            <span>Seleccionar rango de fechas</span>
+                            )}
+                        </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="end">
+                        <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={date?.from}
+                            selected={date}
+                            onSelect={setDate}
+                            numberOfMonths={2}
+                        />
+                        </PopoverContent>
+                    </Popover>
+                    <Button variant="secondary" onClick={() => setDate(undefined)}>Limpiar</Button>
+                </div>
+            </div>
           </CardHeader>
           <CardContent>
             <CreditsTable credits={filteredCredits.filter(c => c.status !== 'Cancelado')} />
@@ -132,9 +196,10 @@ function CreditsTable({ credits }: { credits: Credit[] }) {
             <TableHead>Operación</TableHead>
             <TableHead>Deudor</TableHead>
             <TableHead className="hidden md:table-cell">Tipo</TableHead>
+            <TableHead className="text-right">Monto Otorgado</TableHead>
+            <TableHead className="text-right">Saldo Actual</TableHead>
             <TableHead>Estado</TableHead>
             <TableHead className="hidden md:table-cell">Vencimiento</TableHead>
-            <TableHead className="hidden md:table-cell">Creación</TableHead>
             <TableHead>
               <span className="sr-only">Acciones</span>
             </TableHead>
@@ -156,6 +221,12 @@ function CreditsTable({ credits }: { credits: Credit[] }) {
                   <div className="text-sm text-muted-foreground">{credit.debtorId}</div>
               </TableCell>
               <TableCell className="hidden md:table-cell">{credit.type}</TableCell>
+              <TableCell className="text-right font-mono">
+                ₡{credit.amount.toLocaleString('es-CR')}
+              </TableCell>
+              <TableCell className="text-right font-mono font-semibold">
+                ₡{credit.balance.toLocaleString('es-CR')}
+              </TableCell>
               <TableCell>
                 <Badge variant={getStatusVariant(credit.status)}>
                   {credit.status}
@@ -163,9 +234,6 @@ function CreditsTable({ credits }: { credits: Credit[] }) {
               </TableCell>
               <TableCell className="hidden md:table-cell">
                 {credit.dueDate}
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                {credit.creationDate}
               </TableCell>
               <TableCell>
                 <DropdownMenu>
