@@ -24,8 +24,12 @@ import {
   Activity,
   CircleDollarSign,
   FileDown,
+  TrendingDown,
+  TrendingUp,
+  Receipt,
+  FilePlus,
 } from 'lucide-react';
-import { credits, notifications, clients, opportunities } from '@/lib/data'; // Importamos los datos de ejemplo.
+import { credits, notifications, clients, opportunities, payments } from '@/lib/data'; // Importamos los datos de ejemplo.
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   ChartContainer,
@@ -89,14 +93,20 @@ function CreditStatusChart() {
 export default function DashboardPage() {
   // Calculamos el saldo total de la cartera sumando los saldos de todos los créditos.
   const totalBalance = credits.reduce((sum, credit) => sum + credit.balance, 0);
+  const totalArrears = credits.filter(c => c.status === 'En mora').reduce((sum, credit) => sum + credit.balance, 0);
+  const salesOfTheMonth = credits.filter(c => new Date(c.creationDate).getMonth() === new Date().getMonth()).reduce((sum, c) => sum + c.amount, 0);
+  const interestReceived = payments.reduce((sum, p) => sum + p.amount, 0) * 0.2; // Simulación
+  const expensesOfTheMonth = 12500000; // Simulación
+  const newCredits = credits.filter(c => new Date(c.creationDate) > new Date(new Date().setDate(new Date().getDate() - 30))).length;
+
 
   return (
     <div className="space-y-6">
       {/* Sección de tarjetas de métricas clave. */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {/* Tarjeta 1: Saldo de Cartera */}
-        <Link href="/dashboard/creditos">
-            <Card className="transition-all hover:ring-2 hover:ring-primary/50">
+        <Link href="/dashboard/creditos" className="lg:col-span-2">
+            <Card className="transition-all hover:ring-2 hover:ring-primary/50 h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Saldo de Cartera</CardTitle>
                     <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
@@ -112,22 +122,89 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
         </Link>
-        {/* Tarjeta 2: Créditos Activos */}
-        <Link href="/dashboard/creditos">
-            <Card className="transition-all hover:ring-2 hover:ring-primary/50">
+        {/* Tarjeta 2: Cartera en Mora */}
+        <Link href="/dashboard/cobros">
+            <Card className="transition-all hover:ring-2 hover:ring-destructive/50 h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Créditos Activos</CardTitle>
-                    <Landmark className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium">Cartera en Mora</CardTitle>
+                    <TrendingDown className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">
-                      {credits.filter((c) => c.status !== 'Cancelado').length}
+                    <div className="text-2xl font-bold text-destructive">
+                      ₡{totalArrears.toLocaleString('de-DE')}
                     </div>
-                    <p className="text-xs text-muted-foreground">+5 nuevos esta semana</p>
+                    <p className="text-xs text-muted-foreground">
+                      {credits.filter(c => c.status === 'En mora').length} créditos en mora
+                    </p>
                 </CardContent>
             </Card>
         </Link>
-        {/* Tarjeta 3: Nuevas Oportunidades */}
+        {/* Tarjeta 3: Ventas del Mes */}
+         <Link href="/dashboard/ventas">
+            <Card className="transition-all hover:ring-2 hover:ring-primary/50 h-full">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Ventas del Mes</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">
+                      ₡{salesOfTheMonth.toLocaleString('de-DE')}
+                    </div>
+                     <p className="text-xs text-muted-foreground">
+                      Ventas para el mes actual
+                    </p>
+                </CardContent>
+            </Card>
+        </Link>
+         {/* Tarjeta 4: Intereses Recibidos */}
+         <Link href="/dashboard/cobros?tab=abonos">
+            <Card className="transition-all hover:ring-2 hover:ring-primary/50 h-full">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Intereses Recibidos</CardTitle>
+                    <Receipt className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">
+                      ₡{interestReceived.toLocaleString('de-DE')}
+                    </div>
+                     <p className="text-xs text-muted-foreground">
+                      Este mes (estimado)
+                    </p>
+                </CardContent>
+            </Card>
+        </Link>
+        {/* Tarjeta 5: Gastos del Mes */}
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Gastos del Mes</CardTitle>
+                <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">
+                    - ₡{expensesOfTheMonth.toLocaleString('de-DE')}
+                </div>
+                 <p className="text-xs text-muted-foreground">
+                  Gastos operativos
+                </p>
+            </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Tarjeta Nuevos Créditos */}
+        <Link href="/dashboard/creditos">
+            <Card className="transition-all hover:ring-2 hover:ring-primary/50">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Nuevos Créditos</CardTitle>
+                    <FilePlus className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">+{newCredits}</div>
+                    <p className="text-xs text-muted-foreground">En los últimos 30 días</p>
+                </CardContent>
+            </Card>
+        </Link>
+         {/* Tarjeta 3: Nuevas Oportunidades */}
         <Link href="/dashboard/oportunidades">
             <Card className="transition-all hover:ring-2 hover:ring-primary/50">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -135,7 +212,7 @@ export default function DashboardPage() {
                     <Handshake className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{opportunities.length}</div>
+                    <div className="text-2xl font-bold">+{opportunities.length}</div>
                     <p className="text-xs text-muted-foreground">+10 este mes</p>
                 </CardContent>
             </Card>
@@ -155,7 +232,23 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
         </Link>
+        {/* Tarjeta Créditos Activos */}
+        <Link href="/dashboard/creditos">
+            <Card className="transition-all hover:ring-2 hover:ring-primary/50">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Créditos Activos</CardTitle>
+                    <Landmark className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">
+                      {credits.filter((c) => c.status !== 'Cancelado').length}
+                    </div>
+                    <p className="text-xs text-muted-foreground">+5 nuevos esta semana</p>
+                </CardContent>
+            </Card>
+        </Link>
       </div>
+
 
       {/* Sección con el gráfico y la lista de actividad reciente. */}
       <div className="grid gap-6 lg:grid-cols-2">
@@ -200,23 +293,6 @@ export default function DashboardPage() {
               ))}
             </div>
           </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-6">
-        <Card>
-            <CardHeader>
-                <CardTitle>Reportes</CardTitle>
-                <CardDescription>
-                Genera reportes para análisis y contabilidad.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                 <Button>
-                    <FileDown className="mr-2 h-4 w-4" />
-                    Generar Reporte de Retenciones
-                </Button>
-            </CardContent>
         </Card>
       </div>
     </div>
