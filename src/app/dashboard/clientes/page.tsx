@@ -25,13 +25,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { users, User } from '@/lib/data';
+import { clients, Client } from '@/lib/data';
 import Link from 'next/link';
 
 export default function ClientesPage() {
-  const clientes = users.filter((u) => u.status === 'Cliente');
 
-  const getStatusVariant = (status: User['clientStatus']) => {
+  const getStatusVariant = (status: Client['clientStatus']) => {
     switch (status) {
         case 'Activo': return 'default';
         case 'Moroso': return 'destructive';
@@ -76,46 +75,46 @@ export default function ClientesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clientes.map((user) => (
-              <TableRow key={user.id}>
+            {clients.map((client) => (
+              <TableRow key={client.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user.avatarUrl} alt={user.name} />
-                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={client.avatarUrl} alt={client.name} />
+                      <AvatarFallback>{client.name.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    <div className="font-medium">{user.name}</div>
+                    <div className="font-medium">{client.name}</div>
                   </div>
                 </TableCell>
-                <TableCell>{user.cedula}</TableCell>
+                <TableCell>{client.cedula}</TableCell>
                 <TableCell className="hidden md:table-cell">
                   <div className="text-sm text-muted-foreground">
-                    {user.email}
+                    {client.email}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {user.phone}
+                    {client.phone}
                   </div>
                 </TableCell>
                 <TableCell>
                   <Button variant="link" asChild>
                     <Link
                       href={`/dashboard/creditos?debtorId=${encodeURIComponent(
-                        user.cedula
+                        client.cedula
                       )}`}
                     >
-                      <Badge variant="default">{user.activeCredits}</Badge>
+                      <Badge variant="default">{client.activeCredits}</Badge>
                     </Link>
                   </Button>
                 </TableCell>
                 <TableCell>
-                  {user.clientStatus &&
-                      <Badge variant={getStatusVariant(user.clientStatus)}>
-                        {user.clientStatus}
+                  {client.clientStatus &&
+                      <Badge variant={getStatusVariant(client.clientStatus)}>
+                        {client.clientStatus}
                       </Badge>
                   }
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  {user.registeredOn}
+                  {client.registeredOn}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>

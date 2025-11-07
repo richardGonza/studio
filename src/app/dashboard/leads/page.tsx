@@ -1,6 +1,5 @@
 // Importamos iconos y componentes de la interfaz de usuario.
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,8 +24,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// Importamos los datos de ejemplo para los usuarios.
-import { users } from "@/lib/data";
+// Importamos los datos de ejemplo para los leads.
+import { leads } from "@/lib/data";
 
 // Esta es la función principal que define la página de Leads.
 export default function LeadsPage() {
@@ -52,41 +51,36 @@ export default function LeadsPage() {
           {/* El encabezado de la tabla define las columnas. */}
           <TableHeader>
             <TableRow>
-              <TableHead>Usuario</TableHead>
+              <TableHead>Lead</TableHead>
               <TableHead>Cédula</TableHead>
               <TableHead className="hidden md:table-cell">Contacto</TableHead>
-              <TableHead>Estado</TableHead>
               <TableHead className="hidden md:table-cell">Registrado El</TableHead>
               <TableHead>
                 <span className="sr-only">Acciones</span>
               </TableHead>
             </TableRow>
           </TableHeader>
-          {/* El cuerpo de la tabla se llena con los datos de los usuarios. */}
+          {/* El cuerpo de la tabla se llena con los datos de los leads. */}
           <TableBody>
-            {/* Usamos la función 'map' para crear una fila por cada usuario. */}
-            {users.map((user) => (
-              <TableRow key={user.id}>
+            {leads.map((lead) => (
+              <TableRow key={lead.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user.avatarUrl} alt={user.name} />
-                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={lead.avatarUrl} alt={lead.name} />
+                      <AvatarFallback>{lead.name.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    <div className="font-medium">{user.name}</div>
+                    <div className="font-medium">{lead.name}</div>
                   </div>
                 </TableCell>
-                <TableCell>{user.cedula}</TableCell>
+                <TableCell>{lead.cedula}</TableCell>
                 <TableCell className="hidden md:table-cell">
-                    <div className="text-sm text-muted-foreground">{user.email}</div>
-                    <div className="text-sm text-muted-foreground">{user.phone}</div>
+                    <div className="text-sm text-muted-foreground">{lead.email}</div>
+                    <div className="text-sm text-muted-foreground">{lead.phone}</div>
                 </TableCell>
+                <TableCell className="hidden md:table-cell">{lead.registeredOn}</TableCell>
                 <TableCell>
-                  <Badge variant={user.status === 'Caso Creado' ? 'default' : 'secondary'}>{user.status}</Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">{user.registeredOn}</TableCell>
-                <TableCell>
-                  {/* Menú desplegable con acciones para cada usuario. */}
+                  {/* Menú desplegable con acciones para cada lead. */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button aria-haspopup="true" size="icon" variant="ghost">
