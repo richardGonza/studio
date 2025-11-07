@@ -1,6 +1,7 @@
 
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -180,6 +181,13 @@ export type Payment = {
   source: 'Planilla' | 'Ventanilla' | 'Transferencia';
 };
 
+export type Patrono = {
+  id: string;
+  name: string;
+  category: 'Ministerio' | 'Institución Autónoma' | 'Poder Judicial' | 'Municipalidad' | 'Otro';
+  paymentDate: string;
+};
+
 export const users: User[] = [
     { id: 'STF001', name: 'Jorge Ortiz Solís', email: 'jorge@crepipep.com', avatarUrl: 'https://picsum.photos/seed/staff1/40/40' },
     { id: 'STF002', name: 'Raizza Mildrey Arocena', email: 'raizza@crepipep.com', avatarUrl: 'https://picsum.photos/seed/staff2/40/40' },
@@ -338,4 +346,27 @@ export const payments: Payment[] = [
     { id: 'PAY003', operationNumber: 'CR-006', debtorName: 'Carlos Fernández', paymentDate: '2023-11-02', amount: 60000, source: 'Planilla' },
     { id: 'PAY004', operationNumber: 'MC-001', debtorName: 'Camila Gómez', paymentDate: '2023-11-05', amount: 50000, source: 'Ventanilla' },
     { id: 'PAY005', operationNumber: 'CR-002', debtorName: 'Ana Silva Rojas', paymentDate: '2023-11-06', amount: 70000, difference: 5000, source: 'Transferencia' },
+];
+
+export const patronos: Patrono[] = [
+  { id: 'PAT001', name: 'Ministerio de Educación Pública', category: 'Ministerio', paymentDate: 'Quincenal (10 y 25)' },
+  { id: 'PAT002', name: 'Caja Costarricense de Seguro Social', category: 'Institución Autónoma', paymentDate: 'Quincenal (12 y 27)' },
+  { id: 'PAT003', name: 'Poder Judicial', category: 'Poder Judicial', paymentDate: 'Mensual (22)' },
+  { id: 'PAT004', name: 'Ministerio de Hacienda', category: 'Ministerio', paymentDate: 'Quincenal (13 y 28)' },
+  { id: 'PAT005', name: 'Ministerio de Salud', category: 'Ministerio', paymentDate: 'Quincenal (13 y 28)' },
+  { id: 'PAT006', name: 'Ministerio de Obras Públicas y Transportes', category: 'Ministerio', paymentDate: 'Quincenal (13 y 28)' },
+  { id: 'PAT007', name: 'Instituto Costarricense de Electricidad', category: 'Institución Autónoma', paymentDate: 'Quincenal (14 y 29)' },
+  { id: 'PAT008', name: 'Instituto Nacional de Seguros', category: 'Institución Autónoma', paymentDate: 'Mensual (25)' },
+  { id: 'PAT009', name: 'Acueductos y Alcantarillados', category: 'Institución Autónoma', paymentDate: 'Quincenal (11 y 26)' },
+  { id: 'PAT010', name: 'Refinadora Costarricense de Petróleo', category: 'Institución Autónoma', paymentDate: 'Quincenal (10 y 25)' },
+  { id: 'PAT011', name: 'Municipalidad de San José', category: 'Municipalidad', paymentDate: 'Mensual (30)' },
+  { id: 'PAT012', name: 'Municipalidad de Alajuela', category: 'Municipalidad', paymentDate: 'Mensual (30)' },
+  { id: 'PAT013', name: 'Municipalidad de Cartago', category: 'Municipalidad', paymentDate: 'Mensual (30)' },
+  { id: 'PAT014', name: 'Municipalidad de Heredia', category: 'Municipalidad', paymentDate: 'Mensual (30)' },
+  { id: 'PAT015', name: 'Universidad de Costa Rica', category: 'Institución Autónoma', paymentDate: 'Mensual (28)' },
+  { id: 'PAT016', name: 'Instituto Tecnológico de Costa Rica', category: 'Institución Autónoma', paymentDate: 'Mensual (28)' },
+  { id: 'PAT017', name: 'Universidad Nacional', category: 'Institución Autónoma', paymentDate: 'Mensual (28)' },
+  { id: 'PAT018', name: 'Ministerio de Trabajo y Seguridad Social', category: 'Ministerio', paymentDate: 'Quincenal (13 y 28)' },
+  { id: 'PAT019', name: 'Ministerio de Seguridad Pública', category: 'Ministerio', paymentDate: 'Quincenal (13 y 28)' },
+  { id: 'PAT020', name: 'Junta de Protección Social', category: 'Institución Autónoma', paymentDate: 'Quincenal (10 y 25)' },
 ];

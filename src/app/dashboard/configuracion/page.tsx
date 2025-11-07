@@ -13,7 +13,23 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, PlusCircle, MoreHorizontal } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { patronos, Patrono } from '@/lib/data';
 
 export default function ConfiguracionPage() {
   const { toast } = useToast();
@@ -212,16 +228,62 @@ export default function ConfiguracionPage() {
       <TabsContent value="patronos">
         <Card>
           <CardHeader>
-            <CardTitle>Patronos</CardTitle>
-            <CardDescription>
-              Gestiona la lista de instituciones y patronos.
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                  <CardTitle>Patronos</CardTitle>
+                  <CardDescription>
+                    Gestiona la lista de instituciones y patronos para deducción de planilla.
+                  </CardDescription>
+              </div>
+               <Button size="sm" className="gap-1">
+                    <PlusCircle className="h-4 w-4" />
+                    Agregar Patrono
+                </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <p>
-              Tabla para administrar las instituciones empleadoras, quién
-              cobra y las fechas de cobro.
-            </p>
+             <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre del Patrono</TableHead>
+                  <TableHead>Categoría</TableHead>
+                  <TableHead>Fecha de Cobro</TableHead>
+                  <TableHead>
+                    <span className="sr-only">Acciones</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {patronos.map((patrono) => (
+                  <TableRow key={patrono.id}>
+                    <TableCell className="font-medium">{patrono.name}</TableCell>
+                    <TableCell>{patrono.category}</TableCell>
+                    <TableCell>{patrono.paymentDate}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Alternar menú</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                          <DropdownMenuItem>Editar</DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </TabsContent>
