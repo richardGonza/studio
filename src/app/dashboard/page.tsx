@@ -28,8 +28,9 @@ import {
   TrendingUp,
   Receipt,
   FilePlus,
+  Briefcase,
 } from 'lucide-react';
-import { credits, notifications, clients, opportunities, payments } from '@/lib/data'; // Importamos los datos de ejemplo.
+import { credits, notifications, clients, opportunities, payments, projects, type Project } from '@/lib/data'; // Importamos los datos de ejemplo.
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   ChartContainer,
@@ -39,9 +40,8 @@ import {
 import type { ChartConfig } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
 
-// Preparación de los datos para el gráfico de barras.
-// Contamos la cantidad de créditos por cada estado.
-const chartData = [
+// Preparación de los datos para el gráfico de barras de créditos.
+const creditChartData = [
   { status: 'Al día', count: credits.filter((c) => c.status === 'Al día').length },
   { status: 'En mora', count: credits.filter((c) => c.status === 'En mora').length },
   { status: 'Cancelado', count: credits.filter((c) => c.status === 'Cancelado').length },
@@ -51,8 +51,8 @@ const chartData = [
   },
 ];
 
-// Configuración del gráfico, define la etiqueta y el color para la serie de datos.
-const chartConfig = {
+// Configuración del gráfico de créditos.
+const creditChartConfig = {
   count: {
     label: 'Créditos',
     color: 'hsl(var(--chart-1))',
@@ -62,8 +62,8 @@ const chartConfig = {
 
 function CreditStatusChart() {
     return (
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <BarChart accessibilityLayer data={chartData}>
+        <ChartContainer config={creditChartConfig} className="min-h-[200px] w-full">
+            <BarChart accessibilityLayer data={creditChartData}>
             <CartesianGrid vertical={false} />
             <XAxis
                 dataKey="status"
@@ -80,6 +80,60 @@ function CreditStatusChart() {
                 dataKey="count"
                 fill="var(--color-count)"
                 radius={[4, 4, 0, 0]}
+            />
+            </BarChart>
+        </ChartContainer>
+    );
+}
+
+// --- Gráfico de Progreso de Proyectos ---
+
+// Función para calcular el progreso de un proyecto
+const getProjectProgress = (project: Project) => {
+    const totalTasks = project.milestones.reduce((acc, m) => acc + m.tasks.length, 0);
+    if (totalTasks === 0) return 0;
+    const completedTasks = project.milestones.reduce((acc, m) => acc + m.tasks.filter(t => t.completed).length, 0);
+    return (completedTasks / totalTasks) * 100;
+}
+
+// Preparación de datos para el gráfico de proyectos
+const projectChartData = projects.map(p => ({
+    name: p.name,
+    progress: getProjectProgress(p),
+}));
+
+// Configuración del gráfico de proyectos
+const projectChartConfig = {
+  progress: {
+    label: 'Progreso',
+    color: 'hsl(var(--chart-2))',
+  },
+} satisfies ChartConfig;
+
+
+function ProjectProgressChart() {
+    return (
+        <ChartContainer config={projectChartConfig} className="min-h-[200px] w-full">
+            <BarChart accessibilityLayer data={projectChartData} layout="vertical">
+            <CartesianGrid horizontal={false} />
+            <YAxis
+                dataKey="name"
+                type="category"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                className="text-xs"
+            />
+            <XAxis type="number" dataKey="progress" hide />
+            <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent formatter={(value) => `${Number(value).toFixed(0)}%`} />}
+            />
+            <Bar
+                dataKey="progress"
+                fill="var(--color-progress)"
+                radius={[5, 5, 5, 5]}
+                layout="vertical"
             />
             </BarChart>
         </ChartContainer>
@@ -252,7 +306,7 @@ export default function DashboardPage() {
 
       {/* Sección con el gráfico y la lista de actividad reciente. */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Tarjeta del Gráfico */}
+        {/* Tarjeta del Gráfico de Créditos */}
         <Card>
           <CardHeader>
             <CardTitle>Resumen de Estado de Créditos</CardTitle>
@@ -261,12 +315,26 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Contenedor del gráfico que lo hace responsivo. */}
             <CreditStatusChart />
           </CardContent>
         </Card>
-        {/* Tarjeta de Actividad Reciente */}
+        {/* Tarjeta de Progreso de Proyectos */}
         <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="h-5 w-5" /> Progreso de Proyectos
+            </CardTitle>
+            <CardDescription>
+              Avance general de los proyectos internos clave.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ProjectProgressChart />
+          </CardContent>
+        </Card>
+      </div>
+
+       <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5" /> Actividad Reciente
@@ -294,7 +362,6 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }
