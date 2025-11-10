@@ -4,6 +4,7 @@
 
 
 
+
 export type User = {
   id: string;
   name: string;
@@ -306,7 +307,7 @@ export const projects: Project[] = [
         id: 'PROJ-001',
         name: 'Backend en Laravel',
         leader: 'Leonardo Gómez',
-        leaderAvatar: 'https://picsum.photos/seed/staff1/40/40',
+        leaderAvatar: 'https://picsum.photos/seed/staff5/40/40',
         budget: 15000,
         startDate: '2024-11-11',
         endDate: '2024-11-30',
@@ -378,14 +379,14 @@ export const projects: Project[] = [
 
 export const creditConfigs = {
   regular: {
-    interestRate: 24,
+    interestRate: 36,
     minAmount: 500000,
     maxAmount: 10000000,
     minTerm: 12,
     maxTerm: 72,
   },
   micro: {
-    interestRate: 36,
+    interestRate: 54,
     minAmount: 100000,
     maxAmount: 1000000,
     minTerm: 6,
@@ -628,5 +629,16 @@ export const salesGoals: SalesGoal[] = [
   { id: 'GOAL02', salespersonId: 'STF002', salespersonName: 'Wilmer Marquez', salespersonAvatar: 'https://picsum.photos/seed/staff2/40/40', month: 'Noviembre 2023', goalAmount: 40000000, achievedAmount: 31000000 },
 ];
 
+export const volunteers = [
+    { id: 'VOL001', name: 'Elena Ramírez', email: 'elena.r@email.com', expertise: 'Derecho Laboral', availability: 'Fines de semana', avatarUrl: 'https://picsum.photos/seed/volunteer1/40/40' },
+    { id: 'VOL002', name: 'Andrés Soto', email: 'andres.s@email.com', expertise: 'Derecho de Familia', availability: 'Martes y Jueves por la tarde', avatarUrl: 'https://picsum.photos/seed/volunteer2/40/40' }
+];
 
+export type Volunteer = typeof volunteers[0];
     
+export const branches = [
+    { id: 'BRH001', name: 'Oficina Central', address: 'San José, San José, Calle Central', manager: 'Lic. Administrador' },
+    { id: 'BRH002', name: 'Punto Autorizado #2', address: 'Alajuela, Alajuela, Avenida 2', manager: 'Gerente #2' },
+];
+
+export type Branch = typeof branches[0];

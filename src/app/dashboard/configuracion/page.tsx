@@ -29,7 +29,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { patronos, Patrono, deductoras, Deductora } from '@/lib/data';
+import { patronos, Patrono, deductoras, Deductora, creditConfigs } from '@/lib/data';
 
 export default function ConfiguracionPage() {
   const { toast } = useToast();
@@ -38,7 +38,7 @@ export default function ConfiguracionPage() {
   const [regularConfig, setRegularConfig] = useState({
     minAmount: '500000',
     maxAmount: '10000000',
-    interestRate: '24',
+    interestRate: creditConfigs.regular.interestRate.toString(),
     minTerm: '12',
     maxTerm: '72',
   });
@@ -47,7 +47,7 @@ export default function ConfiguracionPage() {
   const [microConfig, setMicroConfig] = useState({
     minAmount: '100000',
     maxAmount: '1000000',
-    interestRate: '36',
+    interestRate: creditConfigs.micro.interestRate.toString(),
     minTerm: '6',
     maxTerm: '24',
   });
