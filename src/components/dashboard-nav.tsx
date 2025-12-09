@@ -33,7 +33,7 @@ const navItems = [
   { href: '/dashboard/ventas', icon: DollarSign, label: 'VENTAS' },
   { href: '/dashboard/oportunidades', icon: Handshake, label: 'OPORTUNIDADES' },
   { href: '/dashboard/analisis', icon: FileSearch, label: 'ANÁLISIS' },
-  { href: '/dashboard/clientes', icon: UserCheck, label: 'CLIENTES' },
+  { href: '/dashboard/clientes', icon: UserCheck, label: 'CRM' },
   { href: '/dashboard/creditos', icon: Landmark, label: 'CRÉDITOS' },
   { href: '/dashboard/calculos', icon: Calculator, label: 'CÁLCULOS' },
   { href: '/dashboard/cobros', icon: Banknote, label: 'COBROS' },
