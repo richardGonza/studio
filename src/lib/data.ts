@@ -52,6 +52,26 @@ export type Lead = {
   assigned_to_id?: number;
   person_type_id?: number;
   is_active?: boolean;
+  cedula_vencimiento?: string;
+  nivel_academico?: string;
+  profesion?: string;
+  sector?: string;
+  trabajo_provincia?: string;
+  trabajo_canton?: string;
+  trabajo_distrito?: string;
+  trabajo_direccion?: string;
+  institucion_direccion?: string;
+  actividad_economica?: string;
+  tipo_sociedad?: string;
+  nombramientos?: string;
+  estado_puesto?: string;
+  genero?: string;
+  nacionalidad?: string;
+  telefono2?: string;
+  telefono3?: string;
+  institucion_labora?: string;
+  departamento_cargo?: string;
+  deductora_id?: string | number;
 };
 
 export type Client = {
@@ -95,6 +115,20 @@ export type Client = {
       assigned_to_id?: number;
       person_type_id?: number;
       opportunities?: Opportunity[];
+      cedula_vencimiento?: string;
+      nivel_academico?: string;
+      puesto?: string;
+      profesion?: string;
+      sector?: string;
+      trabajo_provincia?: string;
+      trabajo_canton?: string;
+      trabajo_distrito?: string;
+      trabajo_direccion?: string;
+      institucion_direccion?: string;
+      actividad_economica?: string;
+      tipo_sociedad?: string;
+      nombramientos?: string;
+      estado_puesto?: string;
 };
 
 export type Investor = {

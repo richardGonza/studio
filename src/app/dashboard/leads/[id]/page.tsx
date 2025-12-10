@@ -21,6 +21,7 @@ import { CreateOpportunityDialog } from "@/components/opportunities/create-oppor
 
 import api from "@/lib/axios";
 import { Lead } from "@/lib/data";
+import { PROVINCES } from "@/lib/cr-locations";
 
 export default function LeadDetailPage() {
     const params = useParams();
@@ -39,6 +40,7 @@ export default function LeadDetailPage() {
     const [formData, setFormData] = useState<Partial<Lead>>({});
     const [isPanelVisible, setIsPanelVisible] = useState(true);
     const [isOpportunityDialogOpen, setIsOpportunityDialogOpen] = useState(false);
+    const [agents, setAgents] = useState<{id: number, name: string}[]>([]);
 
     useEffect(() => {
         const fetchLead = async () => {
@@ -54,13 +56,92 @@ export default function LeadDetailPage() {
             }
         };
 
+        const fetchAgents = async () => {
+            try {
+                const response = await api.get('/api/agents');
+                setAgents(response.data);
+            } catch (error) {
+                console.error("Error fetching agents:", error);
+            }
+        };
+
         if (id) {
             fetchLead();
+            fetchAgents();
         }
     }, [id, toast]);
 
     const handleInputChange = (field: keyof Lead, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const selectedProvince = React.useMemo(() => 
+        PROVINCES.find(p => p.name === formData.province), 
+        [formData.province]
+    );
+
+    const selectedCanton = React.useMemo(() => 
+        selectedProvince?.cantons.find(c => c.name === formData.canton), 
+        [selectedProvince, formData.canton]
+    );
+
+    const cantons = selectedProvince?.cantons || [];
+    const districts = selectedCanton?.districts || [];
+
+    const handleProvinceChange = (value: string) => {
+        setFormData(prev => ({ 
+            ...prev, 
+            province: value,
+            canton: "",
+            distrito: ""
+        }));
+    };
+
+    const handleCantonChange = (value: string) => {
+        setFormData(prev => ({ 
+            ...prev, 
+            canton: value,
+            distrito: ""
+        }));
+    };
+
+    const handleDistrictChange = (value: string) => {
+        setFormData(prev => ({ ...prev, distrito: value }));
+    };
+
+    // Work Address Logic
+    const selectedWorkProvince = React.useMemo(() => 
+        PROVINCES.find(p => p.name === formData.trabajo_provincia), 
+        [formData.trabajo_provincia]
+    );
+
+    const selectedWorkCanton = React.useMemo(() => 
+        selectedWorkProvince?.cantons.find(c => c.name === formData.trabajo_canton), 
+        [selectedWorkProvince, formData.trabajo_canton]
+    );
+
+    const workCantons = selectedWorkProvince?.cantons || [];
+    const workDistricts = selectedWorkCanton?.districts || [];
+
+    const handleWorkProvinceChange = (value: string) => {
+        setFormData(prev => ({ 
+            ...prev, 
+            trabajo_provincia: value,
+            trabajo_canton: "",
+            trabajo_distrito: ""
+        }));
+    };
+
+    const handleWorkCantonChange = (value: string) => {
+        setFormData(prev => ({ 
+            ...prev, 
+            trabajo_canton: value,
+            trabajo_distrito: ""
+        }));
+    };
+
+    const handleWorkDistrictChange = (value: string) => {
+        setFormData(prev => ({ ...prev, trabajo_distrito: value }));
     };
 
     const handleSave = async () => {
@@ -246,21 +327,64 @@ export default function LeadDetailPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <Label>Vencimiento Cédula</Label>
+                                        <Input
+                                            type="date"
+                                            value={(formData as any).cedula_vencimiento || ""}
+                                            onChange={(e) => handleInputChange("cedula_vencimiento" as keyof Lead, e.target.value)}
+                                            disabled={!isEditMode}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label>Fecha de Nacimiento</Label>
                                         <Input
                                             type="date"
-                                            value={formData.fecha_nacimiento || ""}
+                                            value={formData.fecha_nacimiento ? String(formData.fecha_nacimiento).split('T')[0] : ""}
                                             onChange={(e) => handleInputChange("fecha_nacimiento", e.target.value)}
                                             disabled={!isEditMode}
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <Label>Género</Label>
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).genero || ""} 
+                                                onValueChange={(value) => handleInputChange("genero" as keyof Lead, value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar género" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Masculino">Masculino</SelectItem>
+                                                    <SelectItem value="Femenino">Femenino</SelectItem>
+                                                    <SelectItem value="Otro">Otro</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).genero || ""} disabled />
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label>Estado Civil</Label>
-                                        <Input
-                                            value={formData.estado_civil || ""}
-                                            onChange={(e) => handleInputChange("estado_civil", e.target.value)}
-                                            disabled={!isEditMode}
-                                        />
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).estado_civil || ""} 
+                                                onValueChange={(value) => handleInputChange("estado_civil" as keyof Lead, value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar estado civil" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Soltero(a)">Soltero(a)</SelectItem>
+                                                    <SelectItem value="Casado(a)">Casado(a)</SelectItem>
+                                                    <SelectItem value="Divorciado(a)">Divorciado(a)</SelectItem>
+                                                    <SelectItem value="Viudo(a)">Viudo(a)</SelectItem>
+                                                    <SelectItem value="Unión Libre">Unión Libre</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).estado_civil || ""} disabled />
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -288,6 +412,22 @@ export default function LeadDetailPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <Label>Teléfono 2</Label>
+                                        <Input
+                                            value={(formData as any).telefono2 || ""}
+                                            onChange={(e) => handleInputChange("telefono2" as keyof Lead, e.target.value)}
+                                            disabled={!isEditMode}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Teléfono 3</Label>
+                                        <Input
+                                            value={(formData as any).telefono3 || ""}
+                                            onChange={(e) => handleInputChange("telefono3" as keyof Lead, e.target.value)}
+                                            disabled={!isEditMode}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label>WhatsApp</Label>
                                         <Input
                                             value={formData.whatsapp || ""}
@@ -303,14 +443,6 @@ export default function LeadDetailPage() {
                                             disabled={!isEditMode}
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>Teléfono Amigo</Label>
-                                        <Input
-                                            value={(formData as any).tel_amigo || ""}
-                                            onChange={(e) => handleInputChange("tel_amigo" as keyof Lead, e.target.value)}
-                                            disabled={!isEditMode}
-                                        />
-                                    </div>
                                 </div>
                             </div>
 
@@ -322,27 +454,71 @@ export default function LeadDetailPage() {
                                 <div className="grid gap-4 md:grid-cols-3">
                                     <div className="space-y-2">
                                         <Label>Provincia</Label>
-                                        <Input
-                                            value={(formData as any).province || ""}
-                                            onChange={(e) => handleInputChange("province" as keyof Lead, e.target.value)}
-                                            disabled={!isEditMode}
-                                        />
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).province || ""} 
+                                                onValueChange={handleProvinceChange}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar provincia" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {PROVINCES.map((p) => (
+                                                        <SelectItem key={p.id} value={p.name}>
+                                                            {p.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).province || ""} disabled />
+                                        )}
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Cantón</Label>
-                                        <Input
-                                            value={(formData as any).canton || ""}
-                                            onChange={(e) => handleInputChange("canton" as keyof Lead, e.target.value)}
-                                            disabled={!isEditMode}
-                                        />
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).canton || ""} 
+                                                onValueChange={handleCantonChange}
+                                                disabled={!selectedProvince}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar cantón" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {cantons.map((c) => (
+                                                        <SelectItem key={c.id} value={c.name}>
+                                                            {c.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).canton || ""} disabled />
+                                        )}
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Distrito</Label>
-                                        <Input
-                                            value={(formData as any).distrito || ""}
-                                            onChange={(e) => handleInputChange("distrito" as keyof Lead, e.target.value)}
-                                            disabled={!isEditMode}
-                                        />
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).distrito || ""} 
+                                                onValueChange={handleDistrictChange}
+                                                disabled={!selectedCanton}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar distrito" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {districts.map((d) => (
+                                                        <SelectItem key={d.id} value={d.name}>
+                                                            {d.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).distrito || ""} disabled />
+                                        )}
                                     </div>
                                     <div className="col-span-3 md:col-span-2 space-y-2">
                                         <Label>Dirección Exacta</Label>
@@ -370,11 +546,203 @@ export default function LeadDetailPage() {
                                 <h3 className="text-lg font-medium mb-4">Información Laboral</h3>
                                 <div className="grid gap-4 md:grid-cols-3">
                                     <div className="space-y-2">
-                                        <Label>Ocupación</Label>
-                                        <Input
-                                            value={(formData as any).ocupacion || ""}
-                                            onChange={(e) => handleInputChange("ocupacion" as keyof Lead, e.target.value)}
+                                        <Label>Nivel Académico</Label>
+                                        <Input 
+                                            value={(formData as any).nivel_academico || ""} 
+                                            onChange={(e) => handleInputChange("nivel_academico" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Profesión</Label>
+                                        <Input 
+                                            value={(formData as any).profesion || ""} 
+                                            onChange={(e) => handleInputChange("profesion" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Sector</Label>
+                                        <Input 
+                                            value={(formData as any).sector || ""} 
+                                            onChange={(e) => handleInputChange("sector" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Puesto</Label>
+                                        <Input 
+                                            value={(formData as any).puesto || ""} 
+                                            onChange={(e) => handleInputChange("puesto" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Estado del Puesto</Label>
+                                        <Select 
+                                            value={(formData as any).estado_puesto || ""} 
+                                            onValueChange={(value) => handleInputChange("estado_puesto" as keyof Lead, value)}
                                             disabled={!isEditMode}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Seleccionar estado" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Propiedad">Propiedad</SelectItem>
+                                                <SelectItem value="Interino">Interino</SelectItem>
+                                                <SelectItem value="De paso">De paso</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Institución</Label>
+                                        <Input 
+                                            value={(formData as any).institucion_labora || ""} 
+                                            onChange={(e) => handleInputChange("institucion_labora" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Deductora</Label>
+                                        <Input 
+                                            value={(formData as any).deductora_id || ""} 
+                                            disabled 
+                                            placeholder="Auto-asignado"
+                                        />
+                                    </div>
+                                    <div className="col-span-3 space-y-2">
+                                        <Label>Dirección de la Institución</Label>
+                                        <Textarea 
+                                            value={(formData as any).institucion_direccion || ""} 
+                                            onChange={(e) => handleInputChange("institucion_direccion" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
+                                        />
+                                    </div>
+                                    
+                                    {/* Work Address */}
+                                    <div className="col-span-3">
+                                        <h4 className="text-sm font-medium mb-2 mt-2">Dirección del Trabajo</h4>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Provincia</Label>
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).trabajo_provincia || ""} 
+                                                onValueChange={handleWorkProvinceChange}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar provincia" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {PROVINCES.map((p) => (
+                                                        <SelectItem key={p.id} value={p.name}>
+                                                            {p.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).trabajo_provincia || ""} disabled />
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Cantón</Label>
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).trabajo_canton || ""} 
+                                                onValueChange={handleWorkCantonChange}
+                                                disabled={!selectedWorkProvince}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar cantón" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {workCantons.map((c) => (
+                                                        <SelectItem key={c.id} value={c.name}>
+                                                            {c.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).trabajo_canton || ""} disabled />
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Distrito</Label>
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).trabajo_distrito || ""} 
+                                                onValueChange={handleWorkDistrictChange}
+                                                disabled={!selectedWorkCanton}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar distrito" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {workDistricts.map((d) => (
+                                                        <SelectItem key={d.id} value={d.name}>
+                                                            {d.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).trabajo_distrito || ""} disabled />
+                                        )}
+                                    </div>
+                                    <div className="col-span-3 space-y-2">
+                                        <Label>Dirección Exacta (Trabajo)</Label>
+                                        <Textarea 
+                                            value={(formData as any).trabajo_direccion || ""} 
+                                            onChange={(e) => handleInputChange("trabajo_direccion" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
+                                        />
+                                    </div>
+
+                                    {/* Economic Activity */}
+                                    <div className="col-span-3">
+                                        <h4 className="text-sm font-medium mb-2 mt-2">Actividad Económica</h4>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Actividad Económica</Label>
+                                        <Input 
+                                            value={(formData as any).actividad_economica || ""} 
+                                            onChange={(e) => handleInputChange("actividad_economica" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Tipo Sociedad</Label>
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={(formData as any).tipo_sociedad || ""} 
+                                                onValueChange={(value) => handleInputChange("tipo_sociedad" as keyof Lead, value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar tipo" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="S.R.L" textValue="Sociedad de Responsabilidad Limitada">S.R.L</SelectItem>
+                                                    <SelectItem value="ECMAN" textValue="Empresa en Comandita">ECMAN</SelectItem>
+                                                    <SelectItem value="LTDA" textValue="Limitada">LTDA</SelectItem>
+                                                    <SelectItem value="OC" textValue="Optima Consultores">OC</SelectItem>
+                                                    <SelectItem value="RL" textValue="Responsabilidad Limitada">RL</SelectItem>
+                                                    <SelectItem value="SA" textValue="Sociedad Anónima">SA</SelectItem>
+                                                    <SelectItem value="SACV" textValue="Sociedad Anónima de Capital Variable">SACV</SelectItem>
+                                                    <SelectItem value="No indica" textValue="No indica">No indica</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input value={(formData as any).tipo_sociedad || ""} disabled />
+                                        )}
+                                    </div>
+                                    <div className="col-span-3 space-y-2">
+                                        <Label>Nombramientos</Label>
+                                        <Textarea 
+                                            value={(formData as any).nombramientos || ""} 
+                                            onChange={(e) => handleInputChange("nombramientos" as keyof Lead, e.target.value)} 
+                                            disabled={!isEditMode} 
                                         />
                                     </div>
                                 </div>
@@ -386,6 +754,31 @@ export default function LeadDetailPage() {
                             <div>
                                 <h3 className="text-lg font-medium mb-4">Otros Detalles</h3>
                                 <div className="grid gap-4 md:grid-cols-3">
+                                    <div className="space-y-2">
+                                        <Label>Responsable</Label>
+                                        {isEditMode ? (
+                                            <Select 
+                                                value={String((formData as any).assigned_to_id || "")} 
+                                                onValueChange={(value) => handleInputChange("assigned_to_id" as keyof Lead, value)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Seleccionar responsable" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {agents.map((agent) => (
+                                                        <SelectItem key={agent.id} value={String(agent.id)}>
+                                                            {agent.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input 
+                                                value={agents.find(a => a.id === (formData as any).assigned_to_id)?.name || (formData as any).assigned_to_id || ""} 
+                                                disabled 
+                                            />
+                                        )}
+                                    </div>
                                     <div className="space-y-2">
                                         <Label>Estado</Label>
                                         <Input
@@ -399,22 +792,6 @@ export default function LeadDetailPage() {
                                         <Input
                                             value={(formData as any).source || ""}
                                             onChange={(e) => handleInputChange("source" as keyof Lead, e.target.value)}
-                                            disabled={!isEditMode}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Relacionado A</Label>
-                                        <Input
-                                            value={(formData as any).relacionado_a || ""}
-                                            onChange={(e) => handleInputChange("relacionado_a" as keyof Lead, e.target.value)}
-                                            disabled={!isEditMode}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Tipo Relación</Label>
-                                        <Input
-                                            value={(formData as any).tipo_relacion || ""}
-                                            onChange={(e) => handleInputChange("tipo_relacion" as keyof Lead, e.target.value)}
                                             disabled={!isEditMode}
                                         />
                                     </div>
