@@ -45,7 +45,21 @@ class Client extends Model
         'telefono3',
         'institucion_labora',
         'departamento_cargo',
-        'deductora_id'
+        'deductora_id',
+        'cedula_vencimiento',
+        'nivel_academico',
+        'puesto',
+        'profesion',
+        'sector',
+        'trabajo_provincia',
+        'trabajo_canton',
+        'trabajo_distrito',
+        'trabajo_direccion',
+        'institucion_direccion',
+        'actividad_economica',
+        'tipo_sociedad',
+        'nombramientos',
+        'estado_puesto',
     ];
 
     protected $casts = [

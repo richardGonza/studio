@@ -439,6 +439,25 @@ export default function ClientesPage() {
     return () => clearTimeout(handler);
   }, [handleTseLookup, isFetchingTse, lastTseCedula, leadFormValues.cedula]);
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    if (value.length > 8) value = value.slice(0, 8); // Limit to 8 digits
+
+    let formattedValue = '';
+    if (value.length > 4) {
+      formattedValue = `${value.slice(0, 2)}-${value.slice(2, 4)}-${value.slice(4)}`;
+    } else if (value.length > 2) {
+      formattedValue = `${value.slice(0, 2)}-${value.slice(2)}`;
+    } else {
+      formattedValue = value;
+    }
+
+    setLeadFormValues((prev) => ({
+      ...prev,
+      fechaNacimiento: formattedValue,
+    }));
+  };
+
   const handleLeadSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmedName = leadFormValues.name.trim();
@@ -451,6 +470,16 @@ export default function ClientesPage() {
 
     try {
       setIsSavingLead(true);
+
+      // Convert DD-MM-YYYY to YYYY-MM-DD
+      let formattedDate = null;
+      if (leadFormValues.fechaNacimiento && leadFormValues.fechaNacimiento.length === 10) {
+          const [day, month, year] = leadFormValues.fechaNacimiento.split('-');
+          if (day && month && year) {
+              formattedDate = `${year}-${month}-${day}`;
+          }
+      }
+
       const body = {
         name: trimmedName,
         email: trimmedEmail,
@@ -459,7 +488,7 @@ export default function ClientesPage() {
         apellido1: leadFormValues.apellido1.trim() || null,
         apellido2: leadFormValues.apellido2.trim() || null,
         ...(editingId ? {} : { status: "Nuevo" }),
-        fecha_nacimiento: leadFormValues.fechaNacimiento || null,
+        fecha_nacimiento: formattedDate,
       };
 
       if (editingId) {
@@ -828,8 +857,9 @@ export default function ClientesPage() {
                   inputMode="numeric"
                   placeholder="DD-MM-AAAA"
                   value={leadFormValues.fechaNacimiento}
-                  onChange={handleLeadFieldChange("fechaNacimiento")}
+                  onChange={handleDateChange}
                   disabled={isViewOnly}
+                  maxLength={10}
                 />
               </div>
             </div>
