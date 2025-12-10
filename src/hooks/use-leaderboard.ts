@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getStoredToken } from '@/lib/auth';
+import { getAuthToken } from '@/lib/auth';
 import type { LeaderboardEntry } from '@/types/rewards';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -53,7 +53,7 @@ export function useLeaderboard(options: UseLeaderboardOptions = {}) {
   const [period, setPeriod] = useState<LeaderboardPeriod>(initialPeriod);
 
   const fetchRanking = useCallback(async () => {
-    const token = getStoredToken();
+    const token = getAuthToken();
     if (!token) {
       setError(new Error('No hay sesión activa'));
       setIsLoading(false);
@@ -121,7 +121,7 @@ export function useMyLeaderboardPosition(
   const [error, setError] = useState<Error | null>(null);
 
   const fetchPosition = useCallback(async () => {
-    const token = getStoredToken();
+    const token = getAuthToken();
     if (!token) {
       setError(new Error('No hay sesión activa'));
       setIsLoading(false);
@@ -171,7 +171,7 @@ export function useLeaderboardStats() {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchStats = useCallback(async () => {
-    const token = getStoredToken();
+    const token = getAuthToken();
     if (!token) {
       setError(new Error('No hay sesión activa'));
       setIsLoading(false);
@@ -219,7 +219,7 @@ export function useMultipleLeaderboards(
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchAll = useCallback(async () => {
-    const token = getStoredToken();
+    const token = getAuthToken();
     if (!token) {
       setIsLoading(false);
       return;

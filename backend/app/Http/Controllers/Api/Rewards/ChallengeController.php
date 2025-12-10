@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Rewards;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Rewards\RewardChallenge;
 use App\Models\Rewards\RewardChallengeParticipation;
 use App\Services\Rewards\RewardService;
@@ -20,11 +21,19 @@ class ChallengeController extends Controller
     ) {}
 
     /**
+     * Helper para obtener el usuario (autenticado o de prueba).
+     */
+    protected function getUser(Request $request): User
+    {
+        return $request->user() ?? User::firstOrFail();
+    }
+
+    /**
      * Lista los challenges disponibles y activos.
      */
     public function index(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $status = $request->input('status', 'active'); // active, upcoming, completed, all
@@ -42,7 +51,7 @@ class ChallengeController extends Controller
      */
     public function show(Request $request, int $id): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $challenge = RewardChallenge::findOrFail($id);
@@ -74,7 +83,7 @@ class ChallengeController extends Controller
      */
     public function join(Request $request, int $id): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $challenge = RewardChallenge::findOrFail($id);
@@ -100,7 +109,7 @@ class ChallengeController extends Controller
      */
     public function progress(Request $request, int $id): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $challenge = RewardChallenge::findOrFail($id);

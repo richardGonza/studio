@@ -26,6 +26,7 @@ import {
   Receipt,
   FileText,
   GraduationCap,
+  Trophy,
 } from 'lucide-react';
 
 const navItems = [
@@ -48,6 +49,7 @@ const navItems = [
   },
   { href: '/dashboard/staff', icon: Briefcase, label: 'COLABORADORES' },
   { href: '/dashboard/entrenamiento', icon: GraduationCap, label: 'ENTRENAMIENTO' },
+  { href: '/dashboard/rewards', icon: Trophy, label: 'RECOMPENSAS' },
 ];
 
 export function DashboardNav() {

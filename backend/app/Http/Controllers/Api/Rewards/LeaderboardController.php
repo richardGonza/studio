@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Rewards;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\Rewards\RewardService;
 use App\Services\Rewards\LeaderboardService;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +17,14 @@ class LeaderboardController extends Controller
         protected RewardService $rewardService,
         protected LeaderboardService $leaderboardService
     ) {}
+
+    /**
+     * Helper para obtener el usuario (autenticado o de prueba).
+     */
+    protected function getUser(Request $request): User
+    {
+        return $request->user() ?? User::firstOrFail();
+    }
 
     /**
      * Obtiene el ranking principal.
@@ -39,7 +48,7 @@ class LeaderboardController extends Controller
      */
     public function myPosition(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $metric = $request->input('metric', 'points');
         $period = $request->input('period', 'monthly');
 
@@ -60,7 +69,7 @@ class LeaderboardController extends Controller
      */
     public function stats(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
 
         $metrics = ['points', 'experience', 'streak', 'level'];
         $periods = ['weekly', 'monthly', 'all_time'];

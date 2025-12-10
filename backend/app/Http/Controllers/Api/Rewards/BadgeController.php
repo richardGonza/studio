@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Rewards;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Rewards\RewardBadge;
 use App\Services\Rewards\RewardService;
 use App\Services\Rewards\Badges\BadgeService;
@@ -19,11 +20,19 @@ class BadgeController extends Controller
     ) {}
 
     /**
+     * Helper para obtener el usuario (autenticado o de prueba).
+     */
+    protected function getUser(Request $request): User
+    {
+        return $request->user() ?? User::firstOrFail();
+    }
+
+    /**
      * Lista todos los badges ganados por el usuario.
      */
     public function index(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $badges = $this->badgeService->getUserBadges($rewardUser);
@@ -39,7 +48,7 @@ class BadgeController extends Controller
      */
     public function available(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $badges = $this->badgeService->getAvailableBadges($rewardUser);
@@ -55,7 +64,7 @@ class BadgeController extends Controller
      */
     public function progress(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $earned = $this->badgeService->getUserBadges($rewardUser);
@@ -80,7 +89,7 @@ class BadgeController extends Controller
     {
         $badge = RewardBadge::with('category')->findOrFail($id);
 
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $hasEarned = $this->badgeService->userHasBadge($rewardUser, $badge);

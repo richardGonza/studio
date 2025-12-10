@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Rewards;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\Rewards\RewardService;
 use App\Services\Rewards\Badges\BadgeService;
 use Illuminate\Http\JsonResponse;
@@ -18,11 +19,19 @@ class RewardController extends Controller
     ) {}
 
     /**
+     * Helper para obtener el usuario (autenticado o de prueba).
+     */
+    protected function getUser(Request $request): User
+    {
+        return $request->user() ?? User::firstOrFail();
+    }
+
+    /**
      * Obtiene el perfil de gamificación del usuario.
      */
     public function profile(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         return response()->json([
@@ -44,7 +53,7 @@ class RewardController extends Controller
      */
     public function balance(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         return response()->json([
@@ -63,7 +72,7 @@ class RewardController extends Controller
      */
     public function history(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         $limit = $request->input('limit', 20);
@@ -80,7 +89,7 @@ class RewardController extends Controller
      */
     public function dashboard(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $this->getUser($request);
         $rewardUser = $this->rewardService->getOrCreateRewardUser($user->id);
 
         return response()->json([

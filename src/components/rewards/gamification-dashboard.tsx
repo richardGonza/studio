@@ -301,41 +301,45 @@ export function MiniLeaderboard({ entries, currentUserId, isLoading, limit = 5 }
         </Link>
       </CardHeader>
       <CardContent>
-        {entries.slice(0, limit).map((entry) => (
-          <div 
-            key={entry.user.id} 
-            className={`flex items-center gap-3 py-2 px-2 rounded-lg transition-colors ${
-              currentUserId === entry.user.id ? 'bg-primary/5' : 'hover:bg-muted/50'
-            }`}
-          >
-            <span className={`w-6 text-center ${getRankStyle(entry.rank)}`}>
-              {entry.rank}
-            </span>
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={entry.user.avatar || undefined} />
-              <AvatarFallback className="text-xs">
-                {entry.user.name[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <span className="truncate block text-sm">
-                {entry.user.name}
-                {currentUserId === entry.user.id && (
-                  <span className="text-xs text-muted-foreground ml-1">(tú)</span>
-                )}
+        {entries.length > 0 ? entries.slice(0, limit).map((entry) => {
+          // Safety check for entry data
+          if (!entry?.user) return null;
+          
+          return (
+            <div 
+              key={entry.user.id} 
+              className={`flex items-center gap-3 py-2 px-2 rounded-lg transition-colors ${
+                currentUserId === entry.user.id ? 'bg-primary/5' : 'hover:bg-muted/50'
+              }`}
+            >
+              <span className={`w-6 text-center ${getRankStyle(entry.rank)}`}>
+                {entry.rank}
               </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="font-semibold text-sm">{entry.value.toLocaleString()}</span>
-              {entry.change !== undefined && entry.change !== 0 && (
-                <span className={entry.change > 0 ? 'text-green-500' : 'text-red-500'}>
-                  {entry.change > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={entry.user.avatar || undefined} />
+                <AvatarFallback className="text-xs">
+                  {entry.user.name?.[0] || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <span className="truncate block text-sm">
+                  {entry.user.name || 'Usuario'}
+                  {currentUserId === entry.user.id && (
+                    <span className="text-xs text-muted-foreground ml-1">(tú)</span>
+                  )}
                 </span>
-              )}
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="font-semibold text-sm">{entry.value?.toLocaleString() || '0'}</span>
+                {entry.change !== undefined && entry.change !== 0 && (
+                  <span className={entry.change > 0 ? 'text-green-500' : 'text-red-500'}>
+                    {entry.change > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-        {entries.length === 0 && (
+          );
+        }) : (
           <div className="text-center py-4 text-muted-foreground">
             No hay datos de clasificación disponibles
           </div>
@@ -707,6 +711,178 @@ export function StatsGrid({ stats }: StatsGridProps) {
           </CardContent>
         </Card>
       ))}
+    </div>
+  );
+}
+
+// ============================================
+// GamificationDashboard - Componente principal
+// ============================================
+import { useRewardsDashboard, useChallenges, useBadgeProgress } from "@/hooks/use-rewards";
+import { useLeaderboard } from "@/hooks/use-leaderboard";
+
+export function GamificationDashboard() {
+  const { data: dashboardData, isLoading } = useRewardsDashboard();
+  const { challenges: activeChallenges, isLoading: challengesLoading } = useChallenges('active');
+  const { progress: badgeProgress, isLoading: badgesLoading } = useBadgeProgress();
+  const { ranking, isLoading: leaderboardLoading } = useLeaderboard({ period: 'weekly' });
+  
+  const summary = dashboardData?.summary;
+  const recentTransactions = dashboardData?.recentActivity || [];
+  const leaderboardEntries = ranking?.entries || [];
+  const upcomingBadges = badgeProgress?.inProgress || [];
+
+  // Obtener el userId del localStorage (si existe)
+  const currentUserId = typeof window !== 'undefined' 
+    ? localStorage.getItem('dsf.user.id') || '' 
+    : '';
+
+  return (
+    <div className="space-y-6">
+      {/* Header con perfil */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="md:col-span-2">
+          <ProfileCard 
+            profile={{
+              level: summary?.level || 1,
+              experiencePoints: summary?.experiencePoints || 0,
+              xpForNextLevel: summary?.xpForNextLevel || 100,
+              totalPoints: summary?.totalPoints || 0,
+              lifetimePoints: summary?.lifetimePoints || 0,
+              badgesCount: summary?.badgesCount || 0,
+              currentStreak: summary?.currentStreak || 0,
+              longestStreak: summary?.longestStreak || 0,
+              lastActivityAt: summary?.lastActivityAt || null
+            }} 
+            isLoading={isLoading} 
+          />
+        </div>
+        <div>
+          <StreakCard 
+            streak={{ 
+              current: summary?.currentStreak || 0, 
+              longest: summary?.longestStreak || 0 
+            }} 
+            isLoading={isLoading} 
+          />
+        </div>
+      </div>
+
+      {/* Stats rápidas */}
+      <StatsGrid 
+        stats={[
+          { 
+            label: 'Puntos Totales', 
+            value: summary?.totalPoints?.toLocaleString() || '0', 
+            icon: <Star className="h-4 w-4" /> 
+          },
+          { 
+            label: 'Nivel', 
+            value: summary?.level || 1, 
+            icon: <TrendingUp className="h-4 w-4" /> 
+          },
+          { 
+            label: 'Badges', 
+            value: summary?.badgesCount || 0, 
+            icon: <Award className="h-4 w-4" /> 
+          },
+          { 
+            label: 'Racha', 
+            value: `${summary?.currentStreak || 0} días`, 
+            icon: <Flame className="h-4 w-4" /> 
+          },
+        ]}
+      />
+
+      {/* Grid principal */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Leaderboard */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-yellow-500" />
+              Ranking Semanal
+            </CardTitle>
+            <Link href="/dashboard/rewards/leaderboard">
+              <Button variant="ghost" size="sm">
+                Ver todo <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <MiniLeaderboard 
+              entries={leaderboardEntries || []} 
+              currentUserId={currentUserId ? parseInt(currentUserId, 10) : undefined}
+              isLoading={leaderboardLoading}
+              limit={5}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Desafíos activos */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Target className="h-5 w-5 text-blue-500" />
+              Desafíos Activos
+            </CardTitle>
+            <Link href="/dashboard/rewards/challenges">
+              <Button variant="ghost" size="sm">
+                Ver todos <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <ActiveChallenges 
+              challenges={activeChallenges || []} 
+              isLoading={isLoading}
+              limit={3}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Segunda fila */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Próximos badges */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Award className="h-5 w-5 text-purple-500" />
+              Próximos Badges
+            </CardTitle>
+            <Link href="/dashboard/rewards/badges">
+              <Button variant="ghost" size="sm">
+                Ver todos <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <UpcomingBadges 
+              badges={upcomingBadges || []} 
+              isLoading={isLoading}
+              limit={4}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Actividad reciente */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Clock className="h-5 w-5 text-gray-500" />
+              Actividad Reciente
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RecentActivity 
+              transactions={recentTransactions || []} 
+              isLoading={isLoading}
+              limit={5}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

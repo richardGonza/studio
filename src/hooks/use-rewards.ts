@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getStoredToken } from '@/lib/auth';
+import { getAuthToken } from '@/lib/auth';
 import type {
   DashboardData,
   ProfileData,
@@ -21,7 +21,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
  * Helper para hacer peticiones autenticadas
  */
 async function fetchWithAuth<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = getStoredToken();
+  const token = getAuthToken();
   
   if (!token) {
     throw new Error('No hay sesión activa');
