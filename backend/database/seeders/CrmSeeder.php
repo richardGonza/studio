@@ -47,19 +47,23 @@ class CrmSeeder extends Seeder
         $leadsData = [
             [
                 'name' => 'Carla Díaz Solano', 'cedula' => '3-1111-2222', 'email' => 'carla.dias@example.com', 'phone' => '7555-4444',
-                'puesto' => 'Interino', 'antiguedad' => '2 años', 'assigned_agent_name' => 'Oficina', 'status' => 'Nuevo'
+                'puesto' => 'Interino', 'antiguedad' => '2 años', 'assigned_agent_name' => 'Oficina', 'status' => 'Nuevo',
+                'apellido1' => 'Díaz', 'apellido2' => 'Solano', 'fecha_nacimiento' => '1990-05-15', 'estado_civil' => 'Soltero', 'whatsapp' => '7555-4444', 'tel_casa' => '2222-3333', 'province' => 'San José', 'canton' => 'San José', 'distrito' => 'Pavas', 'direccion1' => 'De la embajada americana 200m norte', 'ocupacion' => 'Administrativa', 'source' => 'Facebook'
             ],
             [
                 'name' => 'Daniel Alves Mora', 'cedula' => '4-2222-3333', 'email' => 'daniel.alves@example.com', 'phone' => '5432-1876',
-                'puesto' => 'En Propiedad', 'antiguedad' => '10 años', 'assigned_agent_name' => 'Carlos Mendez', 'status' => 'Nuevo'
+                'puesto' => 'En Propiedad', 'antiguedad' => '10 años', 'assigned_agent_name' => 'Carlos Mendez', 'status' => 'Nuevo',
+                'apellido1' => 'Alves', 'apellido2' => 'Mora', 'fecha_nacimiento' => '1985-08-20', 'estado_civil' => 'Casado', 'whatsapp' => '5432-1876', 'tel_casa' => '2233-4455', 'province' => 'Alajuela', 'canton' => 'Alajuela', 'distrito' => 'San José', 'direccion1' => 'Barrio San José, casa 25', 'ocupacion' => 'Ingeniero', 'source' => 'Referido'
             ],
             [
                 'name' => 'Eduardo Pereira', 'cedula' => '9-0123-4567', 'email' => 'eduardo.p@example.com', 'phone' => '8123-9876',
-                'puesto' => 'En Propiedad', 'antiguedad' => '8 años', 'assigned_agent_name' => 'Oficina', 'status' => 'Nuevo'
+                'puesto' => 'En Propiedad', 'antiguedad' => '8 años', 'assigned_agent_name' => 'Oficina', 'status' => 'Nuevo',
+                'apellido1' => 'Pereira', 'apellido2' => 'Gómez', 'fecha_nacimiento' => '1988-03-10', 'estado_civil' => 'Divorciado', 'whatsapp' => '8123-9876', 'province' => 'Heredia', 'canton' => 'Heredia', 'distrito' => 'San Francisco', 'direccion1' => 'Condominio Las Flores', 'ocupacion' => 'Contador', 'source' => 'Web'
             ],
             [
                 'name' => 'Fernanda Núñez', 'cedula' => '1-2345-6789', 'email' => 'fernanda.n@example.com', 'phone' => '7890-1234',
-                'puesto' => 'Interino', 'antiguedad' => '6 meses', 'assigned_agent_name' => 'Wilmer Marquez', 'status' => 'Nuevo'
+                'puesto' => 'Interino', 'antiguedad' => '6 meses', 'assigned_agent_name' => 'Wilmer Marquez', 'status' => 'Nuevo',
+                'apellido1' => 'Núñez', 'apellido2' => 'Rojas', 'fecha_nacimiento' => '1995-12-01', 'estado_civil' => 'Soltero', 'whatsapp' => '7890-1234', 'province' => 'Cartago', 'canton' => 'Cartago', 'distrito' => 'Oriental', 'direccion1' => 'Frente al colegio San Luis', 'ocupacion' => 'Recepcionista', 'source' => 'Instagram'
             ],
         ];
 
@@ -76,34 +80,43 @@ class CrmSeeder extends Seeder
                     'person_type_id' => 1, // Lead
                     'assigned_to_id' => $agent ? $agent->id : null,
                     'lead_status_id' => $status ? $status->id : null,
-                    'ocupacion' => $data['puesto'], // Mapping puesto to ocupacion
+                    'ocupacion' => $data['ocupacion'] ?? $data['puesto'],
                     'notes' => "Antigüedad: " . $data['antiguedad'],
                     'is_active' => true,
+                    'apellido1' => $data['apellido1'] ?? null,
+                    'apellido2' => $data['apellido2'] ?? null,
+                    'fecha_nacimiento' => $data['fecha_nacimiento'] ?? null,
+                    'estado_civil' => $data['estado_civil'] ?? null,
+                    'whatsapp' => $data['whatsapp'] ?? null,
+                    'tel_casa' => $data['tel_casa'] ?? null,
+                    'province' => $data['province'] ?? null,
+                    'canton' => $data['canton'] ?? null,
+                    'distrito' => $data['distrito'] ?? null,
+                    'direccion1' => $data['direccion1'] ?? null,
+                    'source' => $data['source'] ?? null,
                 ]
             );
         }
 
-        // 4. Seed Clients
+                // 4. Seed Clients
         $clientsData = [
-            ['name' => 'Ana Silva Rojas', 'cedula' => '1-1234-5678', 'email' => 'ana.silva@example.com', 'phone' => '8765-4321', 'status' => 'Moroso'],
-            ['name' => 'John Doe', 'cedula' => '6-4444-5555', 'email' => 'john.doe@example.com', 'phone' => '1122-3344', 'status' => 'Activo'],
-            ['name' => 'Jane Smith', 'cedula' => '7-5555-6666', 'email' => 'jane.smith@example.com', 'phone' => '9988-7766', 'status' => 'En cobro'],
-            ['name' => 'Peter Jones', 'cedula' => '8-6666-7777', 'email' => 'peter.jones@example.com', 'phone' => '6677-8899', 'status' => 'Inactivo'],
-            ['name' => 'Lucía Méndez', 'cedula' => '9-7777-8888', 'email' => 'lucia.mendez@example.com', 'phone' => '5566-7788', 'status' => 'Activo'],
-            ['name' => 'Carlos Fernández', 'cedula' => '1-8888-9999', 'email' => 'carlos.f@example.com', 'phone' => '4455-6677', 'status' => 'Activo'],
-            ['name' => 'Sofía Hernández', 'cedula' => '2-9999-0000', 'email' => 'sofia.h@example.com', 'phone' => '3344-5566', 'status' => 'Moroso'],
-            ['name' => 'Miguel González', 'cedula' => '3-0000-1111', 'email' => 'miguel.g@example.com', 'phone' => '2233-4455', 'status' => 'Activo'],
-            ['name' => 'Valentina Rossi', 'cedula' => '4-1111-2222', 'email' => 'valentina.r@example.com', 'phone' => '1122-3344', 'status' => 'Activo'],
-            ['name' => 'Javier Rodríguez', 'cedula' => '5-2222-3333', 'email' => 'javier.r@example.com', 'phone' => '9988-7766', 'status' => 'Activo'],
-            ['name' => 'Camila Gómez', 'cedula' => '6-3333-4444', 'email' => 'camila.g@example.com', 'phone' => '8877-6655', 'status' => 'Activo'],
-            ['name' => 'Mateo Díaz', 'cedula' => '7-4444-5555', 'email' => 'mateo.d@example.com', 'phone' => '7766-5544', 'status' => 'Activo'],
-            ['name' => 'Isabella Castillo', 'cedula' => '8-5555-6666', 'email' => 'isabella.c@example.com', 'phone' => '6655-4433', 'status' => 'Fallecido'],
-            ['name' => 'Sebastián Soto', 'cedula' => '9-6666-7777', 'email' => 'sebastian.s@example.com', 'phone' => '5544-3322', 'status' => 'Activo'],
-            ['name' => 'Gabriela Vargas', 'cedula' => '1-7777-8888', 'email' => 'gabriela.v@example.com', 'phone' => '4433-2211', 'status' => 'En cobro'],
-            ['name' => 'Bruno Costa Marin', 'cedula' => '2-0987-6543', 'email' => 'bruno.costa@example.com', 'phone' => '6123-4567', 'status' => 'Activo'],
+            [
+                'name' => 'Ana Gómez', 'cedula' => '1-1111-1111', 'email' => 'ana.gomez@example.com', 'phone' => '8888-8888', 'status' => 'Activo',
+                'apellido1' => 'Gómez', 'apellido2' => 'Pérez', 'fecha_nacimiento' => '1980-01-01', 'estado_civil' => 'Casado', 'whatsapp' => '8888-8888', 'tel_casa' => '2222-2222', 'province' => 'San José', 'canton' => 'San José', 'distrito' => 'Mata Redonda', 'direccion1' => 'Sabana Norte, Torre 1', 'ocupacion' => 'Doctora', 'genero' => 'Femenino', 'nacionalidad' => 'Costarricense'
+            ],
+            [
+                'name' => 'Carlos Ruiz', 'cedula' => '2-2222-2222', 'email' => 'carlos.ruiz@example.com', 'phone' => '8999-9999', 'status' => 'Activo',
+                'apellido1' => 'Ruiz', 'apellido2' => 'Sánchez', 'fecha_nacimiento' => '1975-06-15', 'estado_civil' => 'Soltero', 'whatsapp' => '8999-9999', 'province' => 'Heredia', 'canton' => 'Heredia', 'distrito' => 'Ulloa', 'direccion1' => 'Residencial Los Arcos', 'ocupacion' => 'Abogado', 'genero' => 'Masculino', 'nacionalidad' => 'Costarricense'
+            ],
+            [
+                'name' => 'Beatriz Solano', 'cedula' => '5-5555-5555', 'email' => 'beatriz.s@example.com', 'phone' => '7000-0000', 'status' => 'Inactivo',
+                'apellido1' => 'Solano', 'apellido2' => 'Mora', 'fecha_nacimiento' => '1992-09-20', 'estado_civil' => 'Casado', 'whatsapp' => '7000-0000', 'province' => 'Alajuela', 'canton' => 'Alajuela', 'distrito' => 'La Guácima', 'direccion1' => 'Hacienda Los Reyes', 'ocupacion' => 'Arquitecta', 'genero' => 'Femenino', 'nacionalidad' => 'Costarricense'
+            ],
         ];
 
         foreach ($clientsData as $data) {
+            // $status = ClientStatus::where('name', $data['status'])->first(); // ClientStatus does not exist yet
+
             Client::updateOrCreate(
                 ['cedula' => $data['cedula']],
                 [
@@ -111,8 +124,21 @@ class CrmSeeder extends Seeder
                     'email' => $data['email'],
                     'phone' => $data['phone'],
                     'person_type_id' => 2, // Client
-                    'status' => $data['status'], // Legacy status field
-                    'is_active' => in_array($data['status'], ['Activo', 'Moroso', 'En cobro']),
+                    'status' => $data['status'],
+                    'is_active' => true,
+                    'apellido1' => $data['apellido1'] ?? null,
+                    'apellido2' => $data['apellido2'] ?? null,
+                    'fecha_nacimiento' => $data['fecha_nacimiento'] ?? null,
+                    'estado_civil' => $data['estado_civil'] ?? null,
+                    'whatsapp' => $data['whatsapp'] ?? null,
+                    'tel_casa' => $data['tel_casa'] ?? null,
+                    'province' => $data['province'] ?? null,
+                    'canton' => $data['canton'] ?? null,
+                    'distrito' => $data['distrito'] ?? null,
+                    'direccion1' => $data['direccion1'] ?? null,
+                    'ocupacion' => $data['ocupacion'] ?? null,
+                    'genero' => $data['genero'] ?? null,
+                    'nacionalidad' => $data['nacionalidad'] ?? null,
                 ]
             );
         }

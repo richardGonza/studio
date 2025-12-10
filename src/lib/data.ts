@@ -55,46 +55,46 @@ export type Lead = {
 };
 
 export type Client = {
-    id: string;
-    name: string;
-    cedula: string;
-    email: string;
-    phone: string;
-    clientStatus?: 'Activo' | 'Moroso' | 'En cobro' | 'Fallecido' | 'Inactivo';
-    activeCredits?: number;
-    registeredOn?: string;
-    avatarUrl?: string;
-    status?: string;
-    is_active?: boolean;
-    created_at?: string;
-    apellido1?: string;
-    apellido2?: string;
-    whatsapp?: string;
-    tel_casa?: string;
-    tel_amigo?: string;
-    province?: string;
-    canton?: string;
-    distrito?: string;
-    direccion1?: string;
-    direccion2?: string;
-    ocupacion?: string;
-    estado_civil?: string;
-    fecha_nacimiento?: string;
-    relacionado_a?: string;
-    tipo_relacion?: string;
-    notes?: string;
-    source?: string;
-    genero?: string;
-    nacionalidad?: string;
-    telefono2?: string;
-    telefono3?: string;
-    institucion_labora?: string;
-    departamento_cargo?: string;
-    deductora_id?: string | number;
-    lead_status_id?: number;
-    assigned_to_id?: number;
-    person_type_id?: number;
-    opportunities?: Opportunity[];
+      id: string;
+      name: string;
+      cedula: string;
+      email: string;
+      phone: string;
+      clientStatus?: 'Activo' | 'Moroso' | 'En cobro' | 'Fallecido' | 'Inactivo';
+      activeCredits?: number;
+      registeredOn?: string;
+      avatarUrl?: string;
+      status?: string;
+      is_active?: boolean;
+      created_at?: string;
+      apellido1?: string;
+      apellido2?: string;
+      whatsapp?: string;
+      tel_casa?: string;
+      tel_amigo?: string;
+      province?: string;
+      canton?: string;
+      distrito?: string;
+      direccion1?: string;
+      direccion2?: string;
+      ocupacion?: string;
+      estado_civil?: string;
+      fecha_nacimiento?: string;
+      relacionado_a?: string;
+      tipo_relacion?: string;
+      notes?: string;
+      source?: string;
+      genero?: string;
+      nacionalidad?: string;
+      telefono2?: string;
+      telefono3?: string;
+      institucion_labora?: string;
+      departamento_cargo?: string;
+      deductora_id?: string | number;
+      lead_status_id?: number;
+      assigned_to_id?: number;
+      person_type_id?: number;
+      opportunities?: Opportunity[];
 };
 
 export type Investor = {
@@ -548,39 +548,75 @@ export const branches: Branch[] = [
 export const leads: Lead[] = [
     {
       id: 'LEAD001', name: 'Carla Díaz Solano', cedula: '3-1111-2222', email: 'carla.dias@example.com', phone: '7555-4444', registeredOn: '2023-10-27', avatarUrl: 'https://picsum.photos/seed/avatar3/40/40', juicios: 1, manchas: 2, puesto: 'Interino', antiguedad: '2 años', salarioBase: 650000, salarioNeto: 520000, assignedTo: 'Oficina',
-      lead_status_id: 0
+      lead_status_id: 0,
+      apellido1: 'Díaz', apellido2: 'Solano', fecha_nacimiento: '1990-05-15', estado_civil: 'Soltero', whatsapp: '7555-4444', tel_casa: '2222-3333', province: 'San José', canton: 'San José', distrito: 'Pavas', direccion1: 'De la embajada americana 200m norte', ocupacion: 'Administrativa', status: 'Nuevo', source: 'Facebook', is_active: true
     },
     {
       id: 'LEAD002', name: 'Daniel Alves Mora', cedula: '4-2222-3333', email: 'daniel.alves@example.com', phone: '5432-1876', registeredOn: '2023-10-24', avatarUrl: 'https://picsum.photos/seed/avatar4/40/40', juicios: 0, manchas: 0, puesto: 'En Propiedad', antiguedad: '10 años', salarioBase: 1200000, salarioNeto: 950000, assignedTo: 'Carlos Mendez',
-      lead_status_id: 0
+      lead_status_id: 0,
+      apellido1: 'Alves', apellido2: 'Mora', fecha_nacimiento: '1985-08-20', estado_civil: 'Casado', whatsapp: '5432-1876', tel_casa: '2233-4455', province: 'Alajuela', canton: 'Alajuela', distrito: 'San José', direccion1: 'Barrio San José, casa 25', ocupacion: 'Ingeniero', status: 'Contactado', source: 'Referido', is_active: true
     },
     {
       id: 'LEAD003', name: 'Eduardo Pereira', cedula: '9-0123-4567', email: 'eduardo.p@example.com', phone: '8123-9876', registeredOn: '2023-11-05', avatarUrl: 'https://picsum.photos/seed/avatar6/40/40', juicios: 0, manchas: 1, puesto: 'En Propiedad', antiguedad: '8 años', salarioBase: 980000, salarioNeto: 780000, assignedTo: 'Oficina',
-      lead_status_id: 0
+      lead_status_id: 0,
+      apellido1: 'Pereira', apellido2: 'Gómez', fecha_nacimiento: '1988-03-10', estado_civil: 'Divorciado', whatsapp: '8123-9876', province: 'Heredia', canton: 'Heredia', distrito: 'San Francisco', direccion1: 'Condominio Las Flores', ocupacion: 'Contador', status: 'Nuevo', source: 'Web', is_active: true
     },
     {
       id: 'LEAD004', name: 'Fernanda Núñez', cedula: '1-2345-6789', email: 'fernanda.n@example.com', phone: '7890-1234', registeredOn: '2023-11-06', avatarUrl: 'https://picsum.photos/seed/avatar7/40/40', juicios: 2, manchas: 3, puesto: 'Interino', antiguedad: '6 meses', salarioBase: 450000, salarioNeto: 380000, assignedTo: 'Wilmer Marquez',
-      lead_status_id: 0
+      lead_status_id: 0,
+      apellido1: 'Núñez', apellido2: 'Rojas', fecha_nacimiento: '1995-12-01', estado_civil: 'Soltero', whatsapp: '7890-1234', province: 'Cartago', canton: 'Cartago', distrito: 'Oriental', direccion1: 'Frente al colegio San Luis', ocupacion: 'Recepcionista', status: 'En Proceso', source: 'Instagram', is_active: true
     },
 ];
 
 export const clients: Client[] = [
-    { id: 'USR001', name: 'Ana Silva Rojas', cedula: '1-1234-5678', email: 'ana.silva@example.com', phone: '8765-4321', clientStatus: 'Moroso', activeCredits: 2, registeredOn: '2023-01-26', avatarUrl: 'https://picsum.photos/seed/avatar1/40/40' },
-    { id: 'USR006', name: 'John Doe', cedula: '6-4444-5555', email: 'john.doe@example.com', phone: '1122-3344', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2022-10-29', avatarUrl: 'https://picsum.photos/seed/avatarJD/40/40' },
-    { id: 'USR007', name: 'Jane Smith', cedula: '7-5555-6666', email: 'jane.smith@example.com', phone: '9988-7766', clientStatus: 'En cobro', activeCredits: 1, registeredOn: '2022-09-15', avatarUrl: 'https://picsum.photos/seed/avatarJS/40/40' },
-    { id: 'USR008', name: 'Peter Jones', cedula: '8-6666-7777', email: 'peter.jones@example.com', phone: '6677-8899', clientStatus: 'Inactivo', activeCredits: 0, registeredOn: '2021-08-20', avatarUrl: 'https://picsum.photos/seed/avatarPJ/40/40' },
-    { id: 'USR009', name: 'Lucía Méndez', cedula: '9-7777-8888', email: 'lucia.mendez@example.com', phone: '5566-7788', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-02-11', avatarUrl: 'https://picsum.photos/seed/avatarLM/40/40'},
-    { id: 'USR010', name: 'Carlos Fernández', cedula: '1-8888-9999', email: 'carlos.f@example.com', phone: '4455-6677', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-03-12', avatarUrl: 'https://picsum.photos/seed/avatarCF/40/40'},
-    { id: 'USR011', name: 'Sofía Hernández', cedula: '2-9999-0000', email: 'sofia.h@example.com', phone: '3344-5566', clientStatus: 'Moroso', activeCredits: 1, registeredOn: '2023-04-13', avatarUrl: 'https://picsum.photos/seed/avatarSH/40/40'},
-    { id: 'USR012', name: 'Miguel González', cedula: '3-0000-1111', email: 'miguel.g@example.com', phone: '2233-4455', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-05-14', avatarUrl: 'https://picsum.photos/seed/avatarMG/40/40'},
-    { id: 'USR013', name: 'Valentina Rossi', cedula: '4-1111-2222', email: 'valentina.r@example.com', phone: '1122-3344', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-06-15', avatarUrl: 'https://picsum.photos/seed/avatarVR/40/40'},
-    { id: 'USR014', name: 'Javier Rodríguez', cedula: '5-2222-3333', email: 'javier.r@example.com', phone: '9988-7766', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-07-16', avatarUrl: 'https://picsum.photos/seed/avatarJR/40/40'},
-    { id: 'USR015', name: 'Camila Gómez', cedula: '6-3333-4444', email: 'camila.g@example.com', phone: '8877-6655', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-08-17', avatarUrl: 'https://picsum.photos/seed/avatarCG/40/40'},
-    { id: 'USR016', name: 'Mateo Díaz', cedula: '7-4444-5555', email: 'mateo.d@example.com', phone: '7766-5544', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-09-18', avatarUrl: 'https://picsum.photos/seed/avatarMD/40/40'},
-    { id: 'USR017', name: 'Isabella Castillo', cedula: '8-5555-6666', email: 'isabella.c@example.com', phone: '6655-4433', clientStatus: 'Fallecido', activeCredits: 0, registeredOn: '2022-01-19', avatarUrl: 'https://picsum.photos/seed/avatarIC/40/40'},
-    { id: 'USR018', name: 'Sebastián Soto', cedula: '9-6666-7777', email: 'sebastian.s@example.com', phone: '5544-3322', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-10-20', avatarUrl: 'https://picsum.photos/seed/avatarSS/40/40'},
-    { id: 'USR019', name: 'Gabriela Vargas', cedula: '1-7777-8888', email: 'gabriela.v@example.com', phone: '4433-2211', clientStatus: 'En cobro', activeCredits: 1, registeredOn: '2022-05-21', avatarUrl: 'https://picsum.photos/seed/avatarGV/40/40'},
-    { id: 'USR020', name: 'Bruno Costa Marin', cedula: '2-0987-6543', email: 'bruno.costa@example.com', phone: '6123-4567', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-10-25', avatarUrl: 'https://picsum.photos/seed/avatar2/40/40' },
+    { id: 'USR001', name: 'Ana Silva Rojas', cedula: '1-1234-5678', email: 'ana.silva@example.com', phone: '8765-4321', clientStatus: 'Moroso', activeCredits: 2, registeredOn: '2023-01-26', avatarUrl: 'https://picsum.photos/seed/avatar1/40/40',
+      apellido1: 'Silva', apellido2: 'Rojas', whatsapp: '8765-4321', province: 'San José', canton: 'Escazú', distrito: 'San Rafael', direccion1: 'Residencial Los Laureles', ocupacion: 'Gerente', estado_civil: 'Casado', fecha_nacimiento: '1980-01-15', genero: 'Femenino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR006', name: 'John Doe', cedula: '6-4444-5555', email: 'john.doe@example.com', phone: '1122-3344', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2022-10-29', avatarUrl: 'https://picsum.photos/seed/avatarJD/40/40',
+      apellido1: 'Doe', apellido2: '', whatsapp: '1122-3344', province: 'Guanacaste', canton: 'Liberia', distrito: 'Liberia', direccion1: 'Barrio La Victoria', ocupacion: 'Turismo', estado_civil: 'Soltero', fecha_nacimiento: '1992-06-20', genero: 'Masculino', nacionalidad: 'Estadounidense', is_active: true
+    },
+    { id: 'USR007', name: 'Jane Smith', cedula: '7-5555-6666', email: 'jane.smith@example.com', phone: '9988-7766', clientStatus: 'En cobro', activeCredits: 1, registeredOn: '2022-09-15', avatarUrl: 'https://picsum.photos/seed/avatarJS/40/40',
+      apellido1: 'Smith', apellido2: '', whatsapp: '9988-7766', province: 'Puntarenas', canton: 'Puntarenas', distrito: 'Chacarita', direccion1: 'Frente al mar', ocupacion: 'Pensionada', estado_civil: 'Viudo', fecha_nacimiento: '1955-04-10', genero: 'Femenino', nacionalidad: 'Canadiense', is_active: true
+    },
+    { id: 'USR008', name: 'Peter Jones', cedula: '8-6666-7777', email: 'peter.jones@example.com', phone: '6677-8899', clientStatus: 'Inactivo', activeCredits: 0, registeredOn: '2021-08-20', avatarUrl: 'https://picsum.photos/seed/avatarPJ/40/40',
+      apellido1: 'Jones', apellido2: '', whatsapp: '6677-8899', province: 'Limón', canton: 'Limón', distrito: 'Limón', direccion1: 'Barrio Roosevelt', ocupacion: 'Estibador', estado_civil: 'Unión Libre', fecha_nacimiento: '1985-09-05', genero: 'Masculino', nacionalidad: 'Jamaiquino', is_active: false
+    },
+    { id: 'USR009', name: 'Lucía Méndez', cedula: '9-7777-8888', email: 'lucia.mendez@example.com', phone: '5566-7788', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-02-11', avatarUrl: 'https://picsum.photos/seed/avatarLM/40/40',
+      apellido1: 'Méndez', apellido2: 'Soto', whatsapp: '5566-7788', province: 'San José', canton: 'Desamparados', distrito: 'San Miguel', direccion1: 'Urbanización La Paz', ocupacion: 'Enfermera', estado_civil: 'Soltero', fecha_nacimiento: '1998-02-28', genero: 'Femenino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR010', name: 'Carlos Fernández', cedula: '1-8888-9999', email: 'carlos.f@example.com', phone: '4455-6677', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-03-12', avatarUrl: 'https://picsum.photos/seed/avatarCF/40/40',
+      apellido1: 'Fernández', apellido2: 'López', whatsapp: '4455-6677', province: 'Alajuela', canton: 'San Carlos', distrito: 'Quesada', direccion1: 'Barrio El Carmen', ocupacion: 'Agricultor', estado_civil: 'Casado', fecha_nacimiento: '1975-11-15', genero: 'Masculino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR011', name: 'Sofía Hernández', cedula: '2-9999-0000', email: 'sofia.h@example.com', phone: '3344-5566', clientStatus: 'Moroso', activeCredits: 1, registeredOn: '2023-04-13', avatarUrl: 'https://picsum.photos/seed/avatarSH/40/40',
+      apellido1: 'Hernández', apellido2: 'Mora', whatsapp: '3344-5566', province: 'Heredia', canton: 'Belén', distrito: 'San Antonio', direccion1: 'Condominio La Ribera', ocupacion: 'Arquitecta', estado_civil: 'Soltero', fecha_nacimiento: '1991-07-22', genero: 'Femenino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR012', name: 'Miguel González', cedula: '3-0000-1111', email: 'miguel.g@example.com', phone: '2233-4455', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-05-14', avatarUrl: 'https://picsum.photos/seed/avatarMG/40/40',
+      apellido1: 'González', apellido2: 'Pérez', whatsapp: '2233-4455', province: 'Cartago', canton: 'Paraíso', distrito: 'Paraíso', direccion1: 'Barrio El Salvador', ocupacion: 'Profesor', estado_civil: 'Casado', fecha_nacimiento: '1982-05-30', genero: 'Masculino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR013', name: 'Valentina Rossi', cedula: '4-1111-2222', email: 'valentina.r@example.com', phone: '1122-3344', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-06-15', avatarUrl: 'https://picsum.photos/seed/avatarVR/40/40',
+      apellido1: 'Rossi', apellido2: 'Bianchi', whatsapp: '1122-3344', province: 'San José', canton: 'Santa Ana', distrito: 'Pozos', direccion1: 'Lindora', ocupacion: 'Diseñadora', estado_civil: 'Soltero', fecha_nacimiento: '1996-10-10', genero: 'Femenino', nacionalidad: 'Italiana', is_active: true
+    },
+    { id: 'USR014', name: 'Javier Rodríguez', cedula: '5-2222-3333', email: 'javier.r@example.com', phone: '9988-7766', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-07-16', avatarUrl: 'https://picsum.photos/seed/avatarJR/40/40',
+      apellido1: 'Rodríguez', apellido2: 'Sánchez', whatsapp: '9988-7766', province: 'Alajuela', canton: 'Grecia', distrito: 'Grecia', direccion1: 'Barrio San Roque', ocupacion: 'Mecánico', estado_civil: 'Divorciado', fecha_nacimiento: '1978-03-25', genero: 'Masculino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR015', name: 'Camila Gómez', cedula: '6-3333-4444', email: 'camila.g@example.com', phone: '8877-6655', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-08-17', avatarUrl: 'https://picsum.photos/seed/avatarCG/40/40',
+      apellido1: 'Gómez', apellido2: 'Vargas', whatsapp: '8877-6655', province: 'Heredia', canton: 'San Rafael', distrito: 'San Rafael', direccion1: 'Calle La Joya', ocupacion: 'Estudiante', estado_civil: 'Soltero', fecha_nacimiento: '2001-08-12', genero: 'Femenino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR016', name: 'Mateo Díaz', cedula: '7-4444-5555', email: 'mateo.d@example.com', phone: '7766-5544', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-09-18', avatarUrl: 'https://picsum.photos/seed/avatarMD/40/40',
+      apellido1: 'Díaz', apellido2: 'Castro', whatsapp: '7766-5544', province: 'Puntarenas', canton: 'Garabito', distrito: 'Jaco', direccion1: 'Condominio Vista Mar', ocupacion: 'Empresario', estado_civil: 'Casado', fecha_nacimiento: '1989-12-05', genero: 'Masculino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR017', name: 'Isabella Castillo', cedula: '8-5555-6666', email: 'isabella.c@example.com', phone: '6655-4433', clientStatus: 'Fallecido', activeCredits: 0, registeredOn: '2022-01-19', avatarUrl: 'https://picsum.photos/seed/avatarIC/40/40',
+      apellido1: 'Castillo', apellido2: 'Mora', whatsapp: '6655-4433', province: 'San José', canton: 'Curridabat', distrito: 'Granadilla', direccion1: 'Urbanización Altamonte', ocupacion: 'Abogada', estado_civil: 'Casado', fecha_nacimiento: '1960-02-18', genero: 'Femenino', nacionalidad: 'Costarricense', is_active: false
+    },
+    { id: 'USR018', name: 'Sebastián Soto', cedula: '9-6666-7777', email: 'sebastian.s@example.com', phone: '5544-3322', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-10-20', avatarUrl: 'https://picsum.photos/seed/avatarSS/40/40',
+      apellido1: 'Soto', apellido2: 'Ramírez', whatsapp: '5544-3322', province: 'Guanacaste', canton: 'Nicoya', distrito: 'Nicoya', direccion1: 'Barrio La Cananga', ocupacion: 'Ganadero', estado_civil: 'Soltero', fecha_nacimiento: '1993-06-14', genero: 'Masculino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR019', name: 'Gabriela Vargas', cedula: '1-7777-8888', email: 'gabriela.v@example.com', phone: '4433-2211', clientStatus: 'En cobro', activeCredits: 1, registeredOn: '2022-05-21', avatarUrl: 'https://picsum.photos/seed/avatarGV/40/40',
+      apellido1: 'Vargas', apellido2: 'Jiménez', whatsapp: '4433-2211', province: 'Alajuela', canton: 'Palmares', distrito: 'Palmares', direccion1: 'Barrio La Granja', ocupacion: 'Secretaria', estado_civil: 'Divorciado', fecha_nacimiento: '1984-09-22', genero: 'Femenino', nacionalidad: 'Costarricense', is_active: true
+    },
+    { id: 'USR020', name: 'Bruno Costa Marin', cedula: '2-0987-6543', email: 'bruno.costa@example.com', phone: '6123-4567', clientStatus: 'Activo', activeCredits: 1, registeredOn: '2023-10-25', avatarUrl: 'https://picsum.photos/seed/avatar2/40/40',
+      apellido1: 'Costa', apellido2: 'Marin', whatsapp: '6123-4567', province: 'San José', canton: 'San José', distrito: 'Mata Redonda', direccion1: 'Sabana Norte', ocupacion: 'Consultor', estado_civil: 'Soltero', fecha_nacimiento: '1990-01-01', genero: 'Masculino', nacionalidad: 'Brasileño', is_active: true
+    },
 ];
 
 export const investors: Investor[] = [
@@ -619,6 +655,7 @@ export const credits: Credit[] = [
         debtorName: 'Juan Perez', // Legacy
         amount: 5000000, // Legacy
         balance: 4500000, // Legacy
+        reference: 'CR-2024-001', title: 'Préstamo Personal Juan', category: 'Personal', progress: 10, lead_id: 1, assigned_to: 'Carlos Mendez', opened_at: '2024-01-10', description: 'Préstamo para consolidación de deudas', deductora_id: 1, linea: 'Personal', proceso: 'Normal', documento_id: 'DOC-001'
     },
     {
         id: 2,
@@ -642,6 +679,7 @@ export const credits: Credit[] = [
         debtorName: 'Maria Rodriguez',
         amount: 150000,
         balance: 145000,
+        reference: 'CR-2023-055', title: 'Hipoteca Casa Maria', category: 'Hipotecario', progress: 5, lead_id: 2, assigned_to: 'Wilmer Marquez', opened_at: '2023-05-15', description: 'Compra de vivienda principal', deductora_id: 2, linea: 'Vivienda', proceso: 'Cobro Administrativo', documento_id: 'DOC-002'
     },
     {
         id: 3,
@@ -665,6 +703,7 @@ export const credits: Credit[] = [
         debtorName: 'Carlos Sanchez',
         amount: 8000000,
         balance: 0,
+        reference: 'CR-2022-102', title: 'Prendario Vehículo', category: 'Prendario', progress: 100, lead_id: 3, assigned_to: 'Oficina', opened_at: '2022-10-15', description: 'Compra de vehículo usado', deductora_id: 3, linea: 'Vehículos', proceso: 'Cerrado', documento_id: 'DOC-003'
     },
     {
         id: 4,
@@ -688,6 +727,7 @@ export const credits: Credit[] = [
         debtorName: 'Ana White',
         amount: 10000,
         balance: 9800,
+        reference: 'CR-2024-010', title: 'Préstamo Personal Ana', category: 'Personal', progress: 15, lead_id: 4, assigned_to: 'Daniel Gómez', opened_at: '2023-12-01', description: 'Viaje a Europa', deductora_id: 1, linea: 'Personal', proceso: 'Cobro Judicial', documento_id: 'DOC-004'
     },
     {
         id: 5,
@@ -711,6 +751,7 @@ export const credits: Credit[] = [
         debtorName: 'James Bond',
         amount: 5000,
         balance: 4800,
+        reference: 'CR-2024-088', title: 'Préstamo Personal James', category: 'Personal', progress: 5, lead_id: 5, assigned_to: 'Ahixel Rojas', opened_at: '2024-02-15', description: 'Gastos personales', deductora_id: 4, linea: 'Personal', proceso: 'Normal', documento_id: 'DOC-005'
     },
     {
         id: 6,
@@ -733,6 +774,7 @@ export const credits: Credit[] = [
         debtorName: 'Elena Torres',
         amount: 75000000,
         balance: 70000000,
+        reference: 'CR-2023-200', title: 'Hipoteca Casa Elena', category: 'Hipotecario', progress: 12, lead_id: 6, assigned_to: 'Wilmer Marquez', opened_at: '2023-04-20', description: 'Compra de vivienda', deductora_id: 2, linea: 'Vivienda', proceso: 'Normal', documento_id: 'DOC-006'
     },
     {
         id: 7,
@@ -755,6 +797,7 @@ export const credits: Credit[] = [
         debtorName: 'Mario Jimenez',
         amount: 2000000,
         balance: 1800000,
+        reference: 'CR-2021-005', title: 'Préstamo Personal Mario', category: 'Personal', progress: 60, lead_id: 7, assigned_to: 'Carlos Mendez', opened_at: '2021-05-10', description: 'Reparaciones hogar', deductora_id: 5, linea: 'Personal', proceso: 'Cobro Judicial', documento_id: 'DOC-007'
     },
     {
         id: 8,
@@ -777,6 +820,7 @@ export const credits: Credit[] = [
         debtorName: 'Sofia Castro',
         amount: 25000,
         balance: 24000,
+        reference: 'CR-2024-012', title: 'Prendario Vehículo Sofia', category: 'Prendario', progress: 5, lead_id: 8, assigned_to: 'Oficina', opened_at: '2024-01-20', description: 'Compra de vehículo nuevo', deductora_id: 3, linea: 'Vehículos', proceso: 'Normal', documento_id: 'DOC-008'
     }
 ];
 

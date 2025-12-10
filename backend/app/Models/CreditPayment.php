@@ -22,13 +22,22 @@ class CreditPayment extends Model
         'nuevo_saldo',
         'estado',
         'fecha_movimiento',
-        'movimiento_total'
+        'movimiento_total',
+        'linea',
+        'fecha_inicio',
+        'fecha_corte',
+        'tasa_actual',
+        'plazo_actual',
+        'dias',
+        'dias_mora'
     ];
 
     protected $casts = [
         'fecha_cuota' => 'date',
         'fecha_pago' => 'date',
         'fecha_movimiento' => 'date',
+        'fecha_inicio' => 'date',
+        'fecha_corte' => 'date',
         'cuota' => 'decimal:2',
         'cargos' => 'decimal:2',
         'poliza' => 'decimal:2',
@@ -38,6 +47,7 @@ class CreditPayment extends Model
         'saldo_anterior' => 'decimal:2',
         'nuevo_saldo' => 'decimal:2',
         'movimiento_total' => 'decimal:2',
+        'tasa_actual' => 'decimal:2',
     ];
 
     public function credit()

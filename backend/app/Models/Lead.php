@@ -39,7 +39,14 @@ class Lead extends Model
         'tipo_relacion',
         'is_active',
         'notes',
-        'source'
+        'source',
+        'genero',
+        'nacionalidad',
+        'telefono2',
+        'telefono3',
+        'institucion_labora',
+        'departamento_cargo',
+        'deductora_id'
     ];
 
     protected $casts = [

@@ -4,7 +4,9 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { MoreHorizontal, PlusCircle, Eye, RefreshCw, Pencil } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Eye, RefreshCw, Pencil, FileText, FileSpreadsheet } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -47,10 +49,47 @@ import { useToast } from "@/hooks/use-toast";
 import api from "@/lib/axios";
 import { credits as mockCredits } from "@/lib/data";
 
-interface LeadOption {
-  id: number;
-  name: string;
-  email: string | null;
+interface ClientOption {
+id: string;
+    name: string;
+    cedula: string;
+    email: string;
+    phone: string;
+    clientStatus?: 'Activo' | 'Moroso' | 'En cobro' | 'Fallecido' | 'Inactivo';
+    activeCredits?: number;
+    registeredOn?: string;
+    avatarUrl?: string;
+    status?: string;
+    is_active?: boolean;
+    created_at?: string;
+    apellido1?: string;
+    apellido2?: string;
+    whatsapp?: string;
+    tel_casa?: string;
+    tel_amigo?: string;
+    province?: string;
+    canton?: string;
+    distrito?: string;
+    direccion1?: string;
+    direccion2?: string;
+    ocupacion?: string;
+    estado_civil?: string;
+    fecha_nacimiento?: string;
+    relacionado_a?: string;
+    tipo_relacion?: string;
+    notes?: string;
+    source?: string;
+    genero?: string;
+    nacionalidad?: string;
+    telefono2?: string;
+    telefono3?: string;
+    institucion_labora?: string;
+    departamento_cargo?: string;
+    deductora_id?: string | number;
+    lead_status_id?: number;
+    assigned_to_id?: number;
+    person_type_id?: number;
+    opportunities?: OpportunityOption[];
 }
 
 interface OpportunityOption {
@@ -75,6 +114,25 @@ interface CreditDocument {
   updated_at: string;
 }
 
+interface CreditPayment {
+  id: number;
+  credit_id: number;
+  numero_cuota: number;
+  fecha_cuota: string;
+  fecha_pago: string | null;
+  cuota: number;
+  cargos: number;
+  poliza: number;
+  interes_corriente: number;
+  interes_moratorio: number;
+  amortizacion: number;
+  saldo_anterior: number;
+  nuevo_saldo: number;
+  estado: string;
+  fecha_movimiento: string | null;
+  movimiento_total: number;
+}
+
 interface CreditItem {
   id: number;
   reference: string;
@@ -87,11 +145,12 @@ interface CreditItem {
   description: string | null;
   lead_id: number;
   opportunity_id: string | null;
-  lead?: LeadOption | null;
+  client?: ClientOption | null;
   opportunity?: { id: string; title: string | null } | null;
   created_at?: string | null;
   updated_at?: string | null;
   documents?: CreditDocument[];
+  payments?: CreditPayment[];
   // New fields
   tipo_credito?: string | null;
   numero_operacion?: string | null;
@@ -192,7 +251,7 @@ export default function CreditsPage() {
   const { toast } = useToast();
 
   const [credits, setCredits] = useState<CreditItem[]>([]);
-  const [leads, setLeads] = useState<LeadOption[]>([]);
+  const [leads, setLeads] = useState<ClientOption[]>([]);
   const [opportunities, setOpportunities] = useState<OpportunityOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingLeads, setIsLoadingLeads] = useState(true);
@@ -227,12 +286,12 @@ export default function CreditsPage() {
   const [detailCredit, setDetailCredit] = useState<CreditItem | null>(null);
 
   const currentLead = useMemo(() => {
-    return formValues.leadId ? leads.find((lead) => lead.id === Number.parseInt(formValues.leadId, 10)) : null;
+    return formValues.leadId ? leads.find((lead) => lead.id === formValues.leadId) : null;
   }, [formValues.leadId, leads]);
 
   const availableOpportunities = useMemo(() => {
     return opportunities.filter((opportunity) => {
-      const belongsToLead = formValues.leadId ? opportunity.lead_id === Number.parseInt(formValues.leadId, 10) : true;
+      const belongsToLead = formValues.leadId ? opportunity.lead_id === parseInt(formValues.leadId, 10) : true;
       const canSelectExistingCredit = dialogCredit?.opportunity_id === opportunity.id;
       const isFree = !opportunity.credit;
       return belongsToLead && (canSelectExistingCredit || isFree);
@@ -426,6 +485,195 @@ export default function CreditsPage() {
     }
   };
 
+  const handleExportCSV = (credit: CreditItem) => {
+    const headers = [
+      "Referencia", "Título", "Estado", "Categoría", "Lead", "Monto", "Saldo", "Cuota", "Divisa"
+    ];
+    const row = [
+      credit.reference,
+      credit.title,
+      credit.status,
+      credit.category,
+      credit.client?.name || "",
+      credit.monto_credito,
+      credit.saldo,
+      credit.cuota,
+      credit.divisa
+    ];
+    
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + headers.join(",") + "\n" 
+      + row.join(",");
+      
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `credito_${credit.reference}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportPDF = async (credit: CreditItem) => {
+    const doc = new jsPDF();
+    const currentDate = new Date().toLocaleDateString('es-CR');
+    
+    let fullCredit = credit;
+    try {
+        // Fetch full credit details including payments
+        const res = await api.get(`/api/credits/${credit.id}`);
+        fullCredit = res.data;
+    } catch (e) {
+        console.error("Error fetching full credit details for PDF", e);
+    }
+
+    // Logo (Placeholder or load image)
+    const img = new Image();
+    img.src = '/logopepweb.png';
+    img.onload = () => {
+        doc.addImage(img, 'PNG', 14, 10, 40, 15);
+        generatePDFContent(doc, fullCredit, currentDate);
+    };
+    img.onerror = () => {
+        doc.setFontSize(16);
+        doc.text("CREDIPEP", 14, 20);
+        generatePDFContent(doc, fullCredit, currentDate);
+    };
+  };
+
+  const generatePDFContent = (doc: jsPDF, credit: CreditItem, date: string) => {
+      // Header Center
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("ESTADO DE CUENTA", 105, 15, { align: "center" });
+      
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(`REPORTE AL ${date}`, 105, 22, { align: "center" });
+
+      // Header Right (Account Number)
+      doc.setFontSize(10);
+      doc.text(`*${credit.lead_id}*`, 195, 15, { align: "right" });
+      doc.text(`${credit.lead_id}`, 195, 22, { align: "right" });
+
+      // Customer Info
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${credit.lead_id}`, 14, 35);
+      doc.text(`${credit.client?.name || "CLIENTE DESCONOCIDO"}`, 14, 40);
+
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.text("INST./EMPRESA", 100, 35);
+      doc.text(`${credit.client?.ocupacion || "-"}`, 130, 35);
+      doc.text(`${credit.client?.departamento_cargo || "-"}`, 100, 40);
+      doc.text("SECCIÓN", 100, 45);
+
+      // Planes de Ahorros
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 128); // Dark Blue
+      doc.text("Planes de Ahorros", 14, 55);
+      doc.setTextColor(0, 0, 0); // Black
+
+      // Mock Savings Data
+      autoTable(doc, {
+          startY: 60,
+          head: [['N.CON', 'PLAN', 'MENSUALIDAD', 'INICIO', 'REND.CORTE', 'APORTES', 'RENDIMIENTO', 'ACUMULADO']],
+          body: [
+              ['621', 'SOBRANTES POR APLICAR', '0.00', '27/09/2022', '', '0.64', '0.00', '0.64']
+          ],
+          theme: 'plain',
+          styles: { fontSize: 8, cellPadding: 1 },
+          headStyles: { fontStyle: 'bold',  textColor: [0,0,0] },
+          columnStyles: {
+              0: { cellWidth: 15 },
+              1: { cellWidth: 50 },
+          }
+      });
+
+      // Créditos / Otras deducciones
+      let finalY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 128);
+      doc.text("Créditos / Otras deducciones", 14, finalY);
+      doc.setTextColor(0, 0, 0);
+
+      // Credit Data
+      const creditRow = [
+          credit.numero_operacion || credit.reference,
+          credit.linea || "PEPITO ABIERTO",
+          new Intl.NumberFormat('es-CR', { style: 'decimal', minimumFractionDigits: 2 }).format(credit.monto_credito || 0),
+          credit.plazo || 120,
+          (credit.tasa_anual || 33.55) + "%",
+          new Intl.NumberFormat('es-CR', { style: 'decimal', minimumFractionDigits: 2 }).format(credit.cuota || 0),
+          new Intl.NumberFormat('es-CR', { style: 'decimal', minimumFractionDigits: 2 }).format(credit.saldo || 0),
+          "0.00", // Morosidad
+          credit.primera_deduccion || "01/2022",
+          new Date().toISOString().split('T')[0], // Ult Mov
+          credit.fecha_culminacion_credito || "2032-01-01",
+          credit.status || "NORMAL"
+      ];
+
+      autoTable(doc, {
+          startY: finalY + 5,
+          head: [['OPERACIÓN', 'LINEA', 'MONTO', 'PLAZO', 'TASA', 'CUOTA', 'SALDO', 'MOROSIDAD', 'PRI.DED', 'ULT.MOV', 'TERMINA', 'PROCESO']],
+          body: [creditRow],
+          theme: 'plain',
+          styles: { fontSize: 7, cellPadding: 1 },
+          headStyles: { fontStyle: 'bold', textColor: [0,0,0] },
+      });
+
+      // Fianzas
+      finalY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 128);
+      doc.text("Fianzas", 14, finalY);
+      doc.setTextColor(0, 0, 0);
+      
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(0, 0, 128);
+      doc.line(14, finalY + 2, 195, finalY + 2);
+
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text("*** NO TIENE FIANZAS ACTIVAS ***", 20, finalY + 10);
+
+      // Plan de Pagos (Detailed Installments)
+      if (credit.payments && credit.payments.length > 0) {
+          finalY = finalY + 20;
+          doc.setFontSize(11);
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(0, 0, 128);
+          doc.text("Plan de Pagos", 14, finalY);
+          doc.setTextColor(0, 0, 0);
+
+          const paymentRows = credit.payments.map(p => [
+              p.numero_cuota,
+              formatDate(p.fecha_cuota),
+              formatDate(p.fecha_pago),
+              new Intl.NumberFormat('es-CR', { style: 'decimal', minimumFractionDigits: 2 }).format(p.cuota),
+              new Intl.NumberFormat('es-CR', { style: 'decimal', minimumFractionDigits: 2 }).format(p.interes_corriente),
+              new Intl.NumberFormat('es-CR', { style: 'decimal', minimumFractionDigits: 2 }).format(p.amortizacion),
+              new Intl.NumberFormat('es-CR', { style: 'decimal', minimumFractionDigits: 2 }).format(p.nuevo_saldo),
+              p.estado
+          ]);
+
+          autoTable(doc, {
+              startY: finalY + 5,
+              head: [['#', 'FECHA CUOTA', 'FECHA PAGO', 'CUOTA', 'INTERÉS', 'AMORTIZACIÓN', 'SALDO', 'ESTADO']],
+              body: paymentRows,
+              theme: 'striped',
+              styles: { fontSize: 7, cellPadding: 1 },
+              headStyles: { fontStyle: 'bold', textColor: [0,0,0], fillColor: [220, 220, 220] },
+          });
+      }
+
+      doc.save(`estado_cuenta_${credit.lead_id}.pdf`);
+  };
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -521,9 +769,19 @@ export default function CreditsPage() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                                        <DropdownMenuItem onClick={() => { setDocumentsCredit(credit); setIsDocumentsOpen(true); }}>Gestionar documentos</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => { setDocumentsCredit(credit); setIsDocumentsOpen(true); }}>
+                                            Gestionar documentos
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem asChild>
                                             <Link href={`/dashboard/creditos/${credit.id}`}>Editar</Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleExportCSV(credit)}>
+                                            <FileSpreadsheet className="mr-2 h-4 w-4" />
+                                            Exportar CSV
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleExportPDF(credit)}>
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            Exportar PDF
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                     </DropdownMenu>
@@ -731,7 +989,7 @@ export default function CreditsPage() {
                     <div><Label className="text-muted-foreground">Título</Label><p>{detailCredit.title}</p></div>
                     <div><Label className="text-muted-foreground">Estado</Label><p>{detailCredit.status}</p></div>
                     <div><Label className="text-muted-foreground">Categoría</Label><p>{detailCredit.category}</p></div>
-                    <div><Label className="text-muted-foreground">Lead</Label><p>{detailCredit.lead?.name}</p></div>
+                    <div><Label className="text-muted-foreground">Lead</Label><p>{detailCredit.client?.name}</p></div>
                     <div><Label className="text-muted-foreground">Responsable</Label><p>{detailCredit.assigned_to}</p></div>
                     <div className="col-span-2"><Label className="text-muted-foreground">Descripción</Label><p>{detailCredit.description}</p></div>
                 </div>

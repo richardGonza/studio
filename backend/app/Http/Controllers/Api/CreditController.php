@@ -55,7 +55,7 @@ class CreditController extends Controller
 
     public function show($id)
     {
-        $credit = Credit::with(['lead', 'opportunity', 'documents'])->findOrFail($id);
+        $credit = Credit::with(['lead', 'opportunity', 'documents', 'payments'])->findOrFail($id);
         return response()->json($credit);
     }
 
