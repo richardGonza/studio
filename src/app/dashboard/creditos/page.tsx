@@ -795,6 +795,7 @@ export default function CreditsPage() {
                         <TableHead>No. Operación</TableHead>
                         <TableHead>Divisa</TableHead>
                         <TableHead>Monto</TableHead>
+                        <TableHead>Plazo</TableHead>
                         <TableHead>Saldo</TableHead>
                         <TableHead>Cuota</TableHead>
                         <TableHead>Línea</TableHead>
@@ -803,7 +804,6 @@ export default function CreditsPage() {
                         <TableHead>Vencimiento</TableHead>
                         <TableHead>Proceso</TableHead>
                         <TableHead>Tasa</TableHead>
-                        <TableHead>Plazo</TableHead>
                         <TableHead>Cuotas Atrasadas</TableHead>
                         <TableHead>Deductora</TableHead>
                         <TableHead className="text-right">Acciones</TableHead>
@@ -818,6 +818,7 @@ export default function CreditsPage() {
                           <TableCell className="font-medium">{credit.numero_operacion || credit.reference || "-"}</TableCell>
                           <TableCell>{credit.divisa || "CRC"}</TableCell>
                           <TableCell>{new Intl.NumberFormat('es-CR', { style: 'currency', currency: credit.divisa || 'CRC' }).format(credit.monto_credito || 0)}</TableCell>
+                          <TableCell>{credit.plazo ? `${credit.plazo} meses` : "-"}</TableCell>
                           <TableCell>{new Intl.NumberFormat('es-CR', { style: 'currency', currency: credit.divisa || 'CRC' }).format(credit.saldo || 0)}</TableCell>
                           <TableCell>{new Intl.NumberFormat('es-CR', { style: 'currency', currency: credit.divisa || 'CRC' }).format(credit.cuota || 0)}</TableCell>
                           <TableCell>{credit.linea || "-"}</TableCell>
@@ -826,7 +827,6 @@ export default function CreditsPage() {
                           <TableCell>{formatDate(credit.fecha_culminacion_credito)}</TableCell>
                           <TableCell>{credit.proceso || "-"}</TableCell>
                           <TableCell>{credit.tasa_anual ? `${credit.tasa_anual}%` : "-"}</TableCell>
-                          <TableCell>{credit.plazo ? `${credit.plazo} meses` : "-"}</TableCell>
                           <TableCell>{credit.cuotas_atrasadas || 0}</TableCell>
                           <TableCell>{credit.deductora?.nombre || "-"}</TableCell>
                           <TableCell className="text-right">
