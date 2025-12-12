@@ -53,6 +53,7 @@ import {
 import api from '@/lib/axios';
 import { CaseChat } from '@/components/case-chat';
 import { DocumentManager } from '@/components/document-manager';
+import { CreditDocumentManager } from '@/components/credit-document-manager';
 
 // Interfaces
 interface CreditDocument {
@@ -718,9 +719,18 @@ function CreditDetailClient({ id }: { id: string }) {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <DocumentManager 
-                        personId={credit.lead_id}
-                        initialDocuments={credit.lead?.documents || []}
+                      <CreditDocumentManager
+                        creditId={credit.id}
+                        initialDocuments={credit.documents?.map(doc => ({
+                          id: doc.id,
+                          name: doc.name,
+                          notes: doc.notes || undefined,
+                          path: doc.path || '',
+                          url: doc.url || '',
+                          mime_type: doc.mime_type || '',
+                          size: doc.size || 0,
+                          created_at: doc.created_at
+                        })) || []}
                       />
                     </CardContent>
                   </Card>

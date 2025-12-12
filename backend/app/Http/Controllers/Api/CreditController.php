@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Credit;
 use App\Models\CreditDocument;
 use Illuminate\Http\Request;
+use App\Models\Lead;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -52,6 +53,21 @@ class CreditController extends Controller
         }
 
         $credit = Credit::create($validated);
+
+        // Copy documents from the lead to the credit
+        $lead = Lead::with('documents')->find($validated['lead_id']);
+        if ($lead && $lead->documents->count() > 0) {
+            foreach ($lead->documents as $leadDocument) {
+                $credit->documents()->create([
+                    'name' => $leadDocument->name,
+                    'notes' => $leadDocument->notes,
+                    'path' => $leadDocument->path,
+                    'url' => $leadDocument->url,
+                    'mime_type' => $leadDocument->mime_type,
+                    'size' => $leadDocument->size,
+                ]);
+            }
+        }
 
         return response()->json($credit, 201);
     }
