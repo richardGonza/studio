@@ -709,10 +709,6 @@ export const credits: Credit[] = [
         cuotas_atrasadas: 2,
         deductora: { id: 2, nombre: 'Banco Nacional' },
         lead: { id: 2, name: 'Maria Rodriguez', email: 'maria.rod@example.com' },
-        operationNumber: 'CR-2023-055',
-        debtorName: 'Maria Rodriguez',
-        amount: 150000,
-        balance: 145000,
         reference: 'CR-2023-055', title: 'Hipoteca Casa Maria', category: 'Hipotecario', progress: 5, lead_id: 2, assigned_to: 'Wilmer Marquez', opened_at: '2023-05-15', description: 'Compra de vivienda principal', deductora_id: 2, linea: 'Vivienda', proceso: 'Cobro Administrativo', documento_id: 'DOC-002'
     },
     {
