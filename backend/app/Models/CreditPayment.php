@@ -12,25 +12,27 @@ class CreditPayment extends Model
         'proceso',
         'fecha_cuota',
         'fecha_pago',
-        'cuota',
-        'monto',
+        'cuota',           // Cuota exigible (Snapshot del momento)
+        'monto',           // Dinero real pagado
         'cargos',
         'poliza',
-        'interes_corriente',
-        'interes_moratorio',
-        'amortizacion',
+        'interes_corriente', // Informativo: cuánto de este pago fue a interés
+        'interes_moratorio', // Informativo: cuánto de este pago fue a mora
+        'amortizacion',      // Informativo: cuánto de este pago fue a capital
         'saldo_anterior',
-        'nuevo_saldo',
+        'saldo_nuevo',
         'estado',
         'fecha_movimiento',
-        'movimiento_total',
+        'movimiento_total',  // Usado si hubo excedente
         'linea',
         'fecha_inicio',
         'fecha_corte',
         'tasa_actual',
         'plazo_actual',
         'dias',
-        'dias_mora'
+        'dias_mora',
+        'source', // Origen del pago (Ventanilla, Planilla, etc.)
+        'cedula'  // Referencia para cargas masivas
     ];
 
     protected $casts = [
@@ -40,13 +42,14 @@ class CreditPayment extends Model
         'fecha_inicio' => 'date',
         'fecha_corte' => 'date',
         'cuota' => 'decimal:2',
+        'monto' => 'decimal:2',
         'cargos' => 'decimal:2',
         'poliza' => 'decimal:2',
         'interes_corriente' => 'decimal:2',
         'interes_moratorio' => 'decimal:2',
         'amortizacion' => 'decimal:2',
         'saldo_anterior' => 'decimal:2',
-        'nuevo_saldo' => 'decimal:2',
+        'saldo_nuevo' => 'decimal:2',
         'movimiento_total' => 'decimal:2',
         'tasa_actual' => 'decimal:2',
     ];

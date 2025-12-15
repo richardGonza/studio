@@ -51,11 +51,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import api from '@/lib/axios';
+import { useToast } from "@/hooks/use-toast";
 import { CaseChat } from '@/components/case-chat';
 import { DocumentManager } from '@/components/document-manager';
 import { CreditDocumentManager } from '@/components/credit-document-manager';
 
-// Interfaces
+// --- Interfaces ---
+
 interface CreditDocument {
   id: number;
   credit_id: number;
@@ -184,8 +186,11 @@ interface CreditItem {
   linea?: string | null;
   primera_deduccion?: string | null;
   saldo?: number | null;
+  // saldo_a_favor removed
   proceso?: string | null;
 }
+
+// --- Helpers ---
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return "-";
@@ -204,29 +209,41 @@ function formatCurrency(amount?: number | null): string {
   return new Intl.NumberFormat('es-CR', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
 }
 
+// --- Main Component ---
+
 function CreditDetailClient({ id }: { id: string }) {
   const searchParams = useSearchParams();
+  const { toast } = useToast();
+  
   const [credit, setCredit] = useState<CreditItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPanelVisible, setIsPanelVisible] = useState(true);
+  
+  // Edit State
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState<Partial<CreditItem>>({});
   const [saving, setSaving] = useState(false);
+  
+  // Combobox/Select Data
   const [users, setUsers] = useState<{id: number, name: string}[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
 
+  // --- Fetch Data ---
+
+  const fetchCredit = async () => {
+    try {
+      const response = await api.get(`/api/credits/${id}`);
+      setCredit(response.data);
+      setFormData(response.data);
+    } catch (error) {
+      console.error("Error fetching credit:", error);
+      toast({ title: "Error", description: "No se pudo cargar el crédito", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCredit = async () => {
-      try {
-        const response = await api.get(`/api/credits/${id}`);
-        setCredit(response.data);
-        setFormData(response.data);
-      } catch (error) {
-        console.error("Error fetching credit:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCredit();
   }, [id]);
 
@@ -252,6 +269,8 @@ function CreditDetailClient({ id }: { id: string }) {
     fetchUsers();
   }, []);
 
+  // --- Handlers: Edit ---
+
   const handleInputChange = (field: keyof CreditItem, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -264,8 +283,10 @@ function CreditDetailClient({ id }: { id: string }) {
       await api.put(`/api/credits/${credit.id}`, formData);
       setCredit({ ...credit, ...formData });
       setIsEditMode(false);
+      toast({ title: "Éxito", description: "Crédito actualizado correctamente" });
     } catch (error) {
       console.error("Error saving credit:", error);
+      toast({ title: "Error", description: "No se pudo guardar los cambios", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -275,6 +296,8 @@ function CreditDetailClient({ id }: { id: string }) {
     setFormData(credit || {});
     setIsEditMode(false);
   };
+
+  // --- Render ---
 
   if (loading) {
     return <div className="flex h-full items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
@@ -772,15 +795,16 @@ function CreditDetailClient({ id }: { id: string }) {
             <TabsContent value="plan-pagos">
               {/* Plan de Pagos Table */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Plan de Pagos</CardTitle>
-                  <CardDescription>Detalle de cuotas y movimientos históricos</CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <div>
+                    <CardTitle>Plan de Pagos</CardTitle>
+                    <CardDescription>Detalle de cuotas y movimientos históricos</CardDescription>
+                  </div>
                 </CardHeader>
                 <CardContent className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-      
                         <TableHead className="whitespace-nowrap text-xs">No. Cuota</TableHead>
                         <TableHead className="whitespace-nowrap text-xs">Proceso</TableHead>
                         <TableHead className="whitespace-nowrap text-xs">Fecha Inicio</TableHead>
@@ -833,7 +857,7 @@ function CreditDetailClient({ id }: { id: string }) {
                             <TableCell className="text-xs text-right font-mono">{formatCurrency(payment.saldo_nuevo)}</TableCell>
                             <TableCell className="text-xs text-center">{payment.dias || "-"}</TableCell>
                             <TableCell className="text-xs">
-                              <Badge variant="outline" className="text-[10px] h-5">
+                              <Badge variant="outline" className={`text-[10px] h-5 ${payment.estado === 'Pagado' ? 'bg-green-50 text-green-700 border-green-200' : (payment.estado === 'Parcial' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : '')}`}>
                                 {payment.estado}
                               </Badge>
                             </TableCell>

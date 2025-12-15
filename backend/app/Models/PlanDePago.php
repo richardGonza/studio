@@ -80,7 +80,7 @@ class PlanDePago extends Model
     {
         return $query->where('numero_cuota', '>', 0);
     }
-    protected static function booted()
+    /* protected static function booted()
     {
 
         static::created(function (PlanDePago $plan) {
@@ -157,5 +157,5 @@ class PlanDePago extends Model
                 }
             });
         });
-    }
+    } */
 }
