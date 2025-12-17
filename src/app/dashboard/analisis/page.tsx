@@ -2,51 +2,68 @@
 
 import api from '@/lib/axios';
 import { useEffect, useState } from 'react';
+import { Opportunity, Lead } from '@/lib/data';
 
 // 1. DEFINICIÓN DE TIPOS (Interfaces)
 // Define la estructura para que TypeScript sepa qué esperar de la relación anidada.
 
-interface Lead {
-  id: number;
-  name: string;     // Asumo que tienes un nombre
-  profesion: string | null;
-  puesto: string | null;
-  estado_puesto: string | null;
-}
-
-interface Opportunity {
-  id: number;
-  lead: Lead | null; // La oportunidad tiene un Lead
-}
-
-interface AnalisisItem {
+// Usamos los tipos globales de /lib/data.ts
+type AnalisisItem = {
   id: number;
   reference: string;
   monto_credito: number;
   status: string;
   created_at: string;
-  opportunity: Opportunity | null; // El análisis tiene una Oportunidad
-}
+  opportunity_id?: string;
+  lead_id?: string;
+  // Campos mapeados
+  opportunity?: Opportunity;
+  lead?: Lead;
+};
 
 export default function AnalisisPage() {
   const [analisisList, setAnalisisList] = useState<AnalisisItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
 
-  // 2. FETCH DE DATOS
+  // 2. FETCH DE DATOS (Analisis, Oportunidades, Leads)
   useEffect(() => {
-    const fetchAnalisis = async () => {
+    const fetchAll = async () => {
       try {
-        // Asegúrate de que tu URL apunte a tu backend Laravel
-        // Recuerda: En el controller de Laravel debes tener ->with('opportunity.lead')
-        const response = await api.get(`/api/analisis`);
-        
-        if (!response.status.toString().startsWith('2')) {
-          throw new Error('Error al cargar los análisis');
-        }
+        setLoading(true);
+        // Fetch all in parallel
+        const [analisisRes, oppsRes, leadsRes] = await Promise.all([
+          api.get('/api/analisis'),
+          api.get('/api/opportunities'),
+          api.get('/api/leads'),
+        ]);
+        const analisisData = analisisRes.data as AnalisisItem[];
+        // Opportunities may be paginated
+        const oppsData = Array.isArray(oppsRes.data.data) ? oppsRes.data.data : oppsRes.data;
+        const leadsData = Array.isArray(leadsRes.data.data) ? leadsRes.data.data : leadsRes.data;
+        setOpportunities(oppsData);
+        setLeads(leadsData);
 
-        const data = response.data as AnalisisItem[];
-        setAnalisisList(data);
+        // Map opportunity and lead to each analisis item
+        const mapped = analisisData.map((item) => {
+          // Find opportunity by id (string or number)
+          const opportunity = oppsData.find((o: Opportunity) => String(o.id) === String(item.opportunity_id));
+          // Find lead by id (string or number)
+          let lead: Lead | undefined = undefined;
+          if (item.lead_id) {
+            lead = leadsData.find((l: Lead) => String(l.id) === String(item.lead_id));
+          } else if (opportunity && opportunity.lead) {
+            lead = opportunity.lead;
+          }
+          return {
+            ...item,
+            opportunity,
+            lead,
+          };
+        });
+        setAnalisisList(mapped);
       } catch (err) {
         console.error(err);
         setError('No se pudieron cargar los datos.');
@@ -54,8 +71,7 @@ export default function AnalisisPage() {
         setLoading(false);
       }
     };
-
-    fetchAnalisis();
+    fetchAll();
   }, []);
 
   // 3. RENDERIZADO CONDICIONAL (Carga / Error)
@@ -80,9 +96,6 @@ export default function AnalisisPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Listado de Análisis</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
-          Nuevo Análisis
-        </button>
       </div>
 
       <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-200">
@@ -113,26 +126,25 @@ export default function AnalisisPage() {
 
                   {/* Nombre del Lead */}
                   <td className="px-6 py-4 text-gray-700">
-                    {item.opportunity?.lead?.name || 'Sin Asignar'}
+                    {item.lead?.name || 'Sin Asignar'}
                   </td>
 
                   {/* COLUMNA: Profesión (Acceso anidado) */}
                   <td className="px-6 py-4 text-gray-600">
-                    {/* Usamos ?. (Optional Chaining) para evitar error si lead es null */}
-                    {item.opportunity?.lead?.profesion || '-'}
+                    {item.lead?.profesion || '-'}
                   </td>
 
                   {/* COLUMNA: Puesto */}
                   <td className="px-6 py-4 text-gray-600">
-                    {item.opportunity?.lead?.puesto || '-'}
+                    {item.lead?.puesto || '-'}
                   </td>
 
                   {/* COLUMNA: Estado Puesto */}
                   <td className="px-6 py-4 text-gray-600">
                     <span className={`px-2 py-1 rounded text-xs font-semibold
-                      ${item.opportunity?.lead?.estado_puesto === 'Fijo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+                      ${item.lead?.estado_puesto === 'Fijo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
                     `}>
-                      {item.opportunity?.lead?.estado_puesto || 'N/A'}
+                      {item.lead?.estado_puesto || 'N/A'}
                     </span>
                   </td>
 
