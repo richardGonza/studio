@@ -157,17 +157,27 @@ class OpportunityController extends Controller
                     $newPath = "{$opportunityFolder}/{$fileName}";
                 }
 
-                // Mover el archivo
-                Storage::disk('public')->move($filePath, $newPath);
-                $movedFiles[] = [
-                    'original' => $filePath,
-                    'new' => $newPath
-                ];
+                try {
+                    // Mover el archivo
+                    Storage::disk('public')->move($filePath, $newPath);
+                    $movedFiles[] = [
+                        'original' => $filePath,
+                        'new' => $newPath
+                    ];
 
-                Log::info('Archivo movido a carpeta de oportunidad', [
-                    'from' => $filePath,
-                    'to' => $newPath
-                ]);
+                    Log::info('Archivo movido a carpeta de oportunidad', [
+                        'from' => $filePath,
+                        'to' => $newPath
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error moviendo archivo a carpeta de oportunidad', [
+                        'file' => $filePath,
+                        'new_path' => $newPath,
+                        'error' => $e->getMessage(),
+                        'opportunity_id' => $opportunityId,
+                        'cedula' => $cedula
+                    ]);
+                }
             }
 
             return [
@@ -178,7 +188,6 @@ class OpportunityController extends Controller
                 'files_count' => count($movedFiles),
                 'files' => $movedFiles
             ];
-
         } catch (\Exception $e) {
             Log::error('Error moviendo archivos a carpeta de oportunidad', [
                 'cedula' => $cedula,
