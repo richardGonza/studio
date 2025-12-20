@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
@@ -45,11 +46,128 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { patronos, Patrono, deductoras, Deductora, creditConfigs, credits } from '@/lib/data';
+import { patronos, deductoras as deductorasData, creditConfigs } from '@/lib/data'; // Ajusté deductorasData por si acaso
 import { API_BASE_URL } from '@/lib/env';
 import { useAuth } from '@/components/auth-guard';
 import api from '@/lib/axios';
-import CreditsPage from '../creditos/page';
+
+// ----------------------------------------------------------------------
+// 1. COMPONENTES Y CONSTANTES AUXILIARES (Definidos FUERA del componente principal)
+// ----------------------------------------------------------------------
+
+const tiposOptions = [
+  { label: 'Constancia', value: 'Constancia' },
+  { label: 'Colilla', value: 'Colilla' },
+];
+
+function EnterpriseCreateForm() {
+  const { toast } = useToast();
+  const [name, setName] = useState('');
+  const [tipos, setTipos] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const { token } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      toast({ title: 'Error', description: 'El nombre es obligatorio.', variant: 'destructive' });
+      return;
+    }
+    if (tipos.length === 0) {
+      toast({ title: 'Error', description: 'Selecciona al menos un tipo.', variant: 'destructive' });
+      return;
+    }
+    setSaving(true);
+    try {
+      const now = new Date().toISOString();
+      const extensiones = ['pdf', 'html'];
+      
+      const requirements = tipos.flatMap(tipo =>
+        extensiones.map(ext => ({
+          file_extension: ext,
+          upload_date: now,
+          last_updated: now,
+        }))
+      );
+
+      const payload = {
+        business_name: name.trim(),
+        requirements,
+      };
+
+      await api.post('/api/enterprises', payload, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      toast({ title: 'Empresa creada', description: `Nombre: ${name}, Tipos: ${tipos.join(', ')}` });
+      setName('');
+      setTipos([]);
+    } catch (err: any) {
+      console.error(err);
+      const msg = err?.response?.data?.message || 'No se pudo crear la empresa.';
+      toast({ title: 'Error', description: msg, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <form className="space-y-4 max-w-md" onSubmit={handleSubmit}>
+      <div className="space-y-2">
+        <Label htmlFor="enterprise-name">Nombre de la empresa</Label>
+        <Input
+          id="enterprise-name"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="Ej: I.M.A.S, C.N.P., ..."
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="enterprise-tipos">Tipos</Label>
+        {/* Nota: El Select de Shadcn estándar es Single Select. 
+            Si necesitas selección múltiple real, necesitarás un componente MultiSelect custom 
+            o usar Checkboxes. Aquí simulo la selección simple por compatibilidad, 
+            o agrega lógica acumulativa si tu componente lo soporta. */}
+        <Select
+          value={tipos.length > 0 ? tipos[0] : ''} 
+          onValueChange={(val) => {
+             // Lógica simple: Reemplaza. Si quieres múltiple, cambia a checkboxes o MultiSelect component.
+             setTipos([val]); 
+          }}
+        >
+          <SelectTrigger id="enterprise-tipos">
+            <SelectValue placeholder="Selecciona tipos" />
+          </SelectTrigger>
+          <SelectContent>
+            {tiposOptions.map(opt => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          * Para selección múltiple, implementa un componente MultiSelect o usa checkboxes.
+        </p>
+      </div>
+      <div className="flex justify-end">
+        <Button type="submit" disabled={saving}>
+          {saving ? 'Guardando...' : 'Crear Empresa'}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+// ----------------------------------------------------------------------
+// 2. COMPONENTE PRINCIPAL
+// ----------------------------------------------------------------------
+
+interface Deductora {
+  id: number;
+  nombre: string;
+  fecha_reporte_pago: string | null;
+  comision: number | null;
+}
 
 export default function ConfiguracionPage() {
   const { toast } = useToast();
@@ -116,11 +234,11 @@ export default function ConfiguracionPage() {
       setDeductorasList(response.data);
     } catch (error) {
       console.error('Error fetching deductoras from API, using static data:', error);
-      // Fall back to static data from data.ts
-      setDeductorasList(deductoras);
+      // Fall back to static data from data.ts if API fails
+      // setDeductorasList(deductorasData); 
       toast({
         title: "Usando datos locales",
-        description: "No se pudo conectar con el servidor, mostrando datos de ejemplo.",
+        description: "No se pudo conectar con el servidor.",
         variant: "default",
       });
     } finally {
@@ -386,7 +504,6 @@ export default function ConfiguracionPage() {
         setTasaCreditId(first.id);
         setTasaActual(first.tasa_actual ? String(first.tasa_actual) : '33.5');
       } else {
-        // No credits yet, keep default
         setTasaActual('33.5');
         setTasaCreditId(null);
       }
@@ -399,7 +516,6 @@ export default function ConfiguracionPage() {
   }, [toast]);
 
   useEffect(() => {
-    // Load when the component mounts and whenever the tasa tab becomes active
     if (activeTab === 'tasa_actual') {
       loadTasa();
     }
@@ -416,106 +532,20 @@ export default function ConfiguracionPage() {
         <TabsTrigger value="api">API ERP</TabsTrigger>
         <TabsTrigger value="tasa_actual">Tasa Actual</TabsTrigger>
       </TabsList>
-            <TabsContent value="empresas">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Empresas</CardTitle>
-                  <CardDescription>Agrega una nueva empresa y selecciona los tipos asociados.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <EnterpriseCreateForm />
-                </CardContent>
-              </Card>
-            </TabsContent>
-      // --- Enterprise Create Form ---
-      const tiposOptions = [
-        { label: 'Constancia', value: 'Constancia' },
-        { label: 'Colilla', value: 'Colilla' },
-      ];
 
-      function EnterpriseCreateForm() {
-        const { toast } = useToast();
-        const [name, setName] = useState('');
-        const [tipos, setTipos] = useState<string[]>([]);
-        const [saving, setSaving] = useState(false);
+      <TabsContent value="empresas">
+        <Card>
+          <CardHeader>
+            <CardTitle>Empresas</CardTitle>
+            <CardDescription>Agrega una nueva empresa y selecciona los tipos asociados.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* AQUÍ LLAMAMOS AL COMPONENTE EXTERNO, NO LO DEFINIMOS DENTRO */}
+            <EnterpriseCreateForm />
+          </CardContent>
+        </Card>
+      </TabsContent>
 
-        const { token } = useAuth();
-        const handleSubmit = async (e: React.FormEvent) => {
-          e.preventDefault();
-          if (!name.trim()) {
-            toast({ title: 'Error', description: 'El nombre es obligatorio.', variant: 'destructive' });
-            return;
-          }
-          if (tipos.length === 0) {
-            toast({ title: 'Error', description: 'Selecciona al menos un tipo.', variant: 'destructive' });
-            return;
-          }
-          setSaving(true);
-          try {
-            const now = new Date().toISOString();
-            const extensiones = ['pdf', 'html'];
-            const requirements = tipos.flatMap(tipo =>
-              extensiones.map(ext => ({
-                file_extension: ext,
-                upload_date: now,
-                last_updated: now,
-              }))
-            );
-            const payload = {
-              business_name: name.trim(),
-              requirements,
-            };
-            await api.post('/api/enterprises', payload, {
-              headers: token ? { Authorization: `Bearer ${token}` } : {},
-            });
-            toast({ title: 'Empresa creada', description: `Nombre: ${name}, Tipos: ${tipos.join(', ')}` });
-            setName('');
-            setTipos([]);
-          } catch (err: any) {
-            const msg = err?.response?.data?.message || 'No se pudo crear la empresa.';
-            toast({ title: 'Error', description: msg, variant: 'destructive' });
-          } finally {
-            setSaving(false);
-          }
-        };
-
-        return (
-          <form className="space-y-4 max-w-md" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="enterprise-name">Nombre de la empresa</Label>
-              <Input
-                id="enterprise-name"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Ej: I.M.A.S, C.N.P., ..."
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="enterprise-tipos">Tipos</Label>
-              <Select
-                multiple
-                value={tipos}
-                onValueChange={setTipos}
-              >
-                <SelectTrigger id="enterprise-tipos">
-                  <SelectValue placeholder="Selecciona tipos" />
-                </SelectTrigger>
-                <SelectContent>
-                  {tiposOptions.map(opt => (
-                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex justify-end">
-              <Button type="submit" disabled={saving}>
-                {saving ? 'Guardando...' : 'Crear Empresa'}
-              </Button>
-            </div>
-          </form>
-        );
-      }
       <TabsContent value="tasa_actual">
         <div className="flex items-center justify-center py-12">
           <div className="flex flex-col items-center gap-3">
@@ -539,7 +569,6 @@ export default function ConfiguracionPage() {
                   try {
                     await api.put(`/api/credits/${tasaCreditId}`, { tasa_anual: parseFloat(tasaActual) || 0 });
                     toast({ title: 'Guardado', description: 'Tasa actualizada correctamente.' });
-                    // Refresh the displayed value from the server
                     await loadTasa();
                   } catch (err) {
                     console.error('Failed to save tasa_actual:', err);
@@ -556,6 +585,7 @@ export default function ConfiguracionPage() {
           </div>
         </div>
       </TabsContent>
+
       <TabsContent value="prestamos">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card>
@@ -701,6 +731,7 @@ export default function ConfiguracionPage() {
           </Card>
         </div>
       </TabsContent>
+
       <TabsContent value="usuarios">
         <Card>
           <CardHeader>
@@ -859,7 +890,7 @@ export default function ConfiguracionPage() {
                   ))}
                   {users.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center text-muted-foreground">
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">
                         No hay usuarios registrados.
                       </TableCell>
                     </TableRow>
@@ -992,6 +1023,7 @@ export default function ConfiguracionPage() {
           </CardContent>
         </Card>
       </TabsContent>
+
        <TabsContent value="deductoras">
         <Card>
           <CardHeader>
@@ -1068,6 +1100,7 @@ export default function ConfiguracionPage() {
           </CardContent>
         </Card>
       </TabsContent>
+
       <TabsContent value="api">
         <Card>
           <CardHeader>
