@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('enterprise_requirements', function (Blueprint $table) {
+        Schema::table('enterprises_requirements', function (Blueprint $table) {
             $table->dropColumn('binary');
         });
     }
 
     public function down(): void
     {
-        Schema::table('enterprise_requirements', function (Blueprint $table) {
+        Schema::table('enterprises_requirements', function (Blueprint $table) {
             $table->binary('binary')->nullable();
         });
     }
