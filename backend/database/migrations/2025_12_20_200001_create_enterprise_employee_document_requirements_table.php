@@ -13,7 +13,6 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('enterprise_id')->constrained('enterprises')->onDelete('cascade');
             $table->string('file_extension', 50);
-            $table->binary('binary');
             $table->date('upload_date');
             $table->date('last_updated')->nullable();
             $table->timestamps();
