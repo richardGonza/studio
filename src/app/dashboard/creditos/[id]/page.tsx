@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -787,6 +788,25 @@ function CreditDetailClient({ id }: { id: string }) {
                             ) : (
                               <p className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
                                 {credit.status || "-"}
+                              </p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <Label>¿Tiene póliza?</Label>
+                            {isEditMode ? (
+                              <div className="flex items-center space-x-2 pt-2">
+                                <Switch
+                                  id="poliza-switch"
+                                  checked={!!formData.poliza}
+                                  onCheckedChange={(checked) => handleInputChange("poliza", checked)}
+                                />
+                                <Label htmlFor="poliza-switch" className="font-normal cursor-pointer">
+                                  {formData.poliza ? "Sí" : "No"}
+                                </Label>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-md">
+                                {credit.poliza ? "Sí" : "No"}
                               </p>
                             )}
                           </div>
