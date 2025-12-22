@@ -16,6 +16,7 @@ return new class extends Migration {
         Schema::create('enterprises_requirements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('enterprise_id')->constrained('enterprises')->onDelete('cascade');
+            $table->string('name', 100);
             $table->string('file_extension', 50);
             $table->date('upload_date');
             $table->date('last_updated')->nullable();

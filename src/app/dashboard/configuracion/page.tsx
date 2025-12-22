@@ -84,6 +84,7 @@ function EnterpriseCreateForm() {
 
       const requirements = tipos.flatMap(tipo =>
         extensiones.map(ext => ({
+          name: tipo,
           file_extension: ext,
           upload_date: now,
           last_updated: now,
@@ -226,9 +227,9 @@ const EmpresasTable: React.FC = () => {
                     <TableCell>
                       {empresa.requirements && empresa.requirements.length > 0 ? (
                         <ul className="list-disc pl-4">
-                          {empresa.requirements.map((req: any, idx: number) => (
+                          {[...new Map(empresa.requirements.map((req: any) => [req.name, req])).values()].map((req: any, idx: number) => (
                             <li key={idx}>
-                              {req.name}
+                              {req.name || 'Documento'}
                             </li>
                           ))}
                         </ul>

@@ -13,8 +13,8 @@ class EnterprisesRequirement extends Model
 
     protected $fillable = [
         'enterprise_id',
+        'name',
         'file_extension',
-        'file_name',
         'upload_date',
         'last_updated',
     ];
