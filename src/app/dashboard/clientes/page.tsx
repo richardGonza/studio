@@ -25,6 +25,9 @@ import {
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,6 +43,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 
 // Importamos la conexión real y los tipos
@@ -51,15 +62,17 @@ import { CreateOpportunityDialog } from "@/components/opportunities/create-oppor
 
 const normalizeCedulaInput = (value: string): string => value.replace(/[^0-9]/g, "");
 
-const createEmptyLeadForm = () => ({
-  name: "",
-  apellido1: "",
-  apellido2: "",
-  email: "",
-  phone: "",
-  cedula: "",
-  fechaNacimiento: "",
+const leadSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
+  apellido1: z.string().optional(),
+  apellido2: z.string().optional(),
+  cedula: z.string().optional(),
+  email: z.string().email("Correo inválido"),
+  phone: z.string().optional(),
+  fechaNacimiento: z.string().optional(),
 });
+
+type LeadFormValues = z.infer<typeof leadSchema>;
 
 const formatRegistered = (dateString: string | null | undefined) => {
   if (!dateString) return "-";
@@ -101,7 +114,6 @@ const getStatusBadgeClassName = (label: string): string => {
 
 const getLeadDisplayName = (lead?: Lead | Client | null): string => {
   if (!lead) return "";
-  // Try to construct full name if available or fallback to name
   const fullName = [lead.name, (lead as any).apellido1, (lead as any).apellido2]
     .filter(Boolean)
     .join(" ");
@@ -125,21 +137,21 @@ export default function ClientesPage() {
   const { toast } = useToast();
   const router = useRouter();
 
-  // Data State (Preserved from original)
+  // Data State
   const [clientsData, setClientsData] = useState<Client[]>([]);
   const [leadsData, setLeadsData] = useState<Lead[]>([]);
   const [inactiveData, setInactiveData] = useState<(Lead | Client)[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Lists for Dropdowns (Preserved)
+  // Lists for Dropdowns
   const [leadStatuses, setLeadStatuses] = useState<LeadStatus[]>([]);
 
-  // UI State (New Layout)
+  // UI State
   const [isLeadFiltersOpen, setIsLeadFiltersOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("leads");
 
-  // Filters State (Mapped to original logic where possible)
+  // Filters State
   const [searchQuery, setSearchQuery] = useState("");
   const [contactFilter, setContactFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -149,10 +161,23 @@ export default function ClientesPage() {
   // Dialog State
   const [isLeadDialogOpen, setIsLeadDialogOpen] = useState(false);
   const [isSavingLead, setIsSavingLead] = useState(false);
-  const [leadFormValues, setLeadFormValues] = useState(createEmptyLeadForm());
   const [editingId, setEditingId] = useState<string | Number | null>(null);
   const [editingType, setEditingType] = useState<'lead' | 'client' | null>(null);
   const [isViewOnly, setIsViewOnly] = useState(false);
+
+  // Form Definition
+  const form = useForm<LeadFormValues>({
+    resolver: zodResolver(leadSchema),
+    defaultValues: {
+      name: "",
+      apellido1: "",
+      apellido2: "",
+      email: "",
+      phone: "",
+      cedula: "",
+      fechaNacimiento: "",
+    },
+  });
 
   // TSE Lookup State
   const [isFetchingTse, setIsFetchingTse] = useState(false);
@@ -168,7 +193,6 @@ export default function ClientesPage() {
 
   // --- Effects ---
 
-  // Fetch Lists (Statuses) once
     useEffect(() => {
     const fetchLists = async () => {
       try {
@@ -182,7 +206,6 @@ export default function ClientesPage() {
     fetchLists();
     }, []);
 
-  // Fetch Data Logic (Preserved)
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
@@ -193,7 +216,6 @@ export default function ClientesPage() {
       if (dateFrom) commonParams.date_from = dateFrom;
       if (dateTo) commonParams.date_to = dateTo;
 
-      // Prepare specific params
       const leadParams = { ...commonParams };
       const clientParams = { ...commonParams };
 
@@ -238,7 +260,6 @@ export default function ClientesPage() {
     }
   }, [searchQuery, contactFilter, dateFrom, dateTo, activeTab, statusFilter]);
 
-  // Trigger fetch when filters change
   useEffect(() => {
     const timeoutId = setTimeout(() => {
         fetchData();
@@ -261,7 +282,6 @@ export default function ClientesPage() {
       setDateTo("");
   };
 
-  // Export Handlers (Adapted to new UI style but keeping logic)
   const handleExportPDF = () => {
     let dataToExport: any[] = [];
     let title = "";
@@ -359,7 +379,15 @@ export default function ClientesPage() {
   // --- Dialog Handlers ---
 
   const openLeadDialog = () => {
-    setLeadFormValues(createEmptyLeadForm());
+    form.reset({
+      name: "",
+      apellido1: "",
+      apellido2: "",
+      email: "",
+      phone: "",
+      cedula: "",
+      fechaNacimiento: "",
+    });
     setEditingId(null);
     setEditingType(null);
     setLastTseCedula(null);
@@ -369,22 +397,14 @@ export default function ClientesPage() {
 
   const closeLeadDialog = () => {
     setIsLeadDialogOpen(false);
-    setLeadFormValues(createEmptyLeadForm());
+    form.reset();
     setEditingId(null);
     setEditingType(null);
     setLastTseCedula(null);
     setIsViewOnly(false);
   };
 
-  const handleLeadFieldChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setLeadFormValues((previous) => ({
-      ...previous,
-      [field]: value,
-    }));
-  };
-
-  // TSE Lookup Logic (New Feature)
+  // TSE Lookup Logic
   const handleTseLookup = useCallback(
     async (cedulaInput: string): Promise<void> => {
       const trimmed = cedulaInput.trim();
@@ -405,34 +425,29 @@ export default function ClientesPage() {
         const normalizedApellido1 = typeof payload.apellido1 === "string" ? payload.apellido1.trim() : "";
         const normalizedApellido2 = typeof payload.apellido2 === "string" ? payload.apellido2.trim() : "";
         const normalizedCedula = typeof payload.cedula === "string" ? payload.cedula.trim() : normalizedCedulaValue;
-
-        // Format date from TSE (usually DD/MM/YYYY or similar) to display format
         const rawDate = payload["fecha-nacimiento"] || payload.fecha_nacimiento || "";
 
-        setLeadFormValues((previous) => ({
-          ...previous,
-          name: normalizedName || previous.name,
-          apellido1: normalizedApellido1 || previous.apellido1,
-          apellido2: normalizedApellido2 || previous.apellido2,
-          cedula: normalizedCedula || previous.cedula,
-          fechaNacimiento: rawDate || previous.fechaNacimiento,
-        }));
+        form.setValue("name", normalizedName);
+        form.setValue("apellido1", normalizedApellido1);
+        form.setValue("apellido2", normalizedApellido2);
+        form.setValue("cedula", normalizedCedula);
+        form.setValue("fechaNacimiento", rawDate);
 
         setLastTseCedula(normalizeCedulaInput(normalizedCedula || normalizedCedulaValue));
         toast({ title: "Datos cargados", description: "Información completada desde el TSE." });
       } catch (error) {
         console.error("Error consultando TSE", error);
-        // Silent fail or mild toast
       } finally {
         setIsFetchingTse(false);
       }
     },
-    [lastTseCedula, toast]
+    [lastTseCedula, toast, form]
   );
 
-  // Trigger TSE lookup on cedula change
+  const cedulaValue = form.watch("cedula");
+
   useEffect(() => {
-    const sanitized = normalizeCedulaInput(leadFormValues.cedula.trim());
+    const sanitized = normalizeCedulaInput((cedulaValue || "").trim());
     if (!sanitized || sanitized.length < 9 || sanitized === lastTseCedula || isFetchingTse) {
       return;
     }
@@ -440,11 +455,11 @@ export default function ClientesPage() {
       void handleTseLookup(sanitized);
     }, 600);
     return () => clearTimeout(handler);
-  }, [handleTseLookup, isFetchingTse, lastTseCedula, leadFormValues.cedula]);
+  }, [handleTseLookup, isFetchingTse, lastTseCedula, cedulaValue]);
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-    if (value.length > 8) value = value.slice(0, 8); // Limit to 8 digits
+    let value = e.target.value.replace(/\D/g, ''); 
+    if (value.length > 8) value = value.slice(0, 8);
 
     let formattedValue = '';
     if (value.length > 4) {
@@ -455,41 +470,28 @@ export default function ClientesPage() {
       formattedValue = value;
     }
 
-    setLeadFormValues((prev) => ({
-      ...prev,
-      fechaNacimiento: formattedValue,
-    }));
+    form.setValue("fechaNacimiento", formattedValue);
   };
 
-  const handleLeadSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmedName = leadFormValues.name.trim();
-    const trimmedEmail = leadFormValues.email.trim();
-
-    if (!trimmedName || !trimmedEmail) {
-      toast({ title: "Faltan datos", description: "Nombre y correo son obligatorios.", variant: "destructive" });
-      return;
-    }
+  const onSubmit = async (values: LeadFormValues) => {
+    setIsSavingLead(true);
 
     try {
-      setIsSavingLead(true);
-
-      // Convert DD-MM-YYYY to YYYY-MM-DD
       let formattedDate = null;
-      if (leadFormValues.fechaNacimiento && leadFormValues.fechaNacimiento.length === 10) {
-          const [day, month, year] = leadFormValues.fechaNacimiento.split('-');
+      if (values.fechaNacimiento && values.fechaNacimiento.length === 10) {
+          const [day, month, year] = values.fechaNacimiento.split('-');
           if (day && month && year) {
               formattedDate = `${year}-${month}-${day}`;
           }
       }
 
       const body = {
-        name: trimmedName,
-        email: trimmedEmail,
-        cedula: normalizeCedulaInput(leadFormValues.cedula) || null,
-        phone: leadFormValues.phone.trim() || null,
-        apellido1: leadFormValues.apellido1.trim() || null,
-        apellido2: leadFormValues.apellido2.trim() || null,
+        name: values.name.trim(),
+        email: values.email.trim(),
+        cedula: normalizeCedulaInput(values.cedula || "") || null,
+        phone: values.phone?.trim() || null,
+        apellido1: values.apellido1?.trim() || null,
+        apellido2: values.apellido2?.trim() || null,
         ...(editingId ? {} : { status: "Nuevo" }),
         fecha_nacimiento: formattedDate,
       };
@@ -507,7 +509,27 @@ export default function ClientesPage() {
       fetchData();
     } catch (error: any) {
       console.error("Error guardando:", error);
-      toast({ title: "Error", description: "No se pudo guardar.", variant: "destructive" });
+      // Improved error handling
+      if (error.response?.data?.errors) {
+        const errors = error.response.data.errors;
+        // Map backend errors to form fields
+        Object.keys(errors).forEach((key) => {
+          // Assuming the backend returns standard Laravel error structure
+          // e.g. { errors: { email: ["The email has already been taken."] } }
+          const message = errors[key][0];
+          // Map backend field names to frontend field names if they differ
+          // Here they mostly match (email, name, cedula, etc.)
+          form.setError(key as keyof LeadFormValues, { type: "server", message });
+        });
+        
+        toast({
+          title: "Error de validación", 
+          description: "Por favor revisa los campos marcados en rojo.", 
+          variant: "destructive"
+        });
+      } else {
+        toast({ title: "Error", description: error.response?.data?.message || "No se pudo guardar.", variant: "destructive" });
+      }
     } finally {
       setIsSavingLead(false);
     }
@@ -522,7 +544,22 @@ export default function ClientesPage() {
               setIsOpportunityDialogOpen(true);
               break;
           case 'edit':
-              router.push(`/dashboard/leads/${lead.id}?mode=edit`);
+              // Normally router push, but here using the dialog for now to test validation?
+              // The original code used router.push. I'll respect that but if we want to edit IN dialog:
+              // router.push(`/dashboard/leads/${lead.id}?mode=edit`);
+              // Let's implement edit IN dialog to show off the form
+              setEditingId(lead.id);
+              setEditingType('lead');
+              form.reset({
+                name: lead.name,
+                apellido1: (lead as any).apellido1 || "",
+                apellido2: (lead as any).apellido2 || "",
+                email: lead.email,
+                phone: lead.phone || "",
+                cedula: lead.cedula || "",
+                fechaNacimiento: (lead as any).fecha_nacimiento ? formatDateForInput((lead as any).fecha_nacimiento) : "",
+              });
+              setIsLeadDialogOpen(true);
               break;
           case 'view':
               router.push(`/dashboard/leads/${lead.id}?mode=view`);
@@ -534,6 +571,17 @@ export default function ClientesPage() {
               handleArchiveLead(lead);
               break;
       }
+  };
+
+  // Helper to convert YYYY-MM-DD to DD-MM-YYYY for the input
+  const formatDateForInput = (dateStr: string) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "";
+    // Adjust for timezone if needed, or simple split if string format is consistent
+    // Assuming YYYY-MM-DD from backend
+    const [y, m, d] = dateStr.split('T')[0].split('-');
+    return `${d}-${m}-${y}`;
   };
 
   const handleConvertLead = async (lead: Lead) => {
@@ -570,7 +618,19 @@ export default function ClientesPage() {
   };
 
   const handleEditClient = (client: Client) => {
-      router.push(`/dashboard/clientes/${client.id}?mode=edit`);
+      // Same logic, use dialog for now to test validation
+      setEditingId(client.id);
+      setEditingType('client');
+      form.reset({
+        name: client.name,
+        apellido1: (client as any).apellido1 || "",
+        apellido2: (client as any).apellido2 || "",
+        email: client.email,
+        phone: client.phone || "",
+        cedula: client.cedula || "",
+        fechaNacimiento: (client as any).fecha_nacimiento ? formatDateForInput((client as any).fecha_nacimiento) : "",
+      });
+      setIsLeadDialogOpen(true);
   };
 
   const confirmDeleteClient = (client: Client) => {
@@ -626,6 +686,7 @@ export default function ClientesPage() {
             <CardContent>
               <div className="space-y-6">
                 <CollapsibleContent className="space-y-4 rounded-md border border-dashed border-muted-foreground/30 p-4">
+                  {/* Filters UI preserved */}
                   <div className="flex flex-wrap items-end gap-3">
                     <div className="flex flex-wrap items-end gap-3">
                       <div className="space-y-1">
@@ -693,8 +754,7 @@ export default function ClientesPage() {
                             {Array.isArray(leadStatuses) && leadStatuses.length > 0
                               ? leadStatuses.map(status => (
                                   <SelectItem key={status.id} value={String(status.id)} className="focus:bg-[lightgray]/48 cursor-pointer">{status.name}</SelectItem>
-                                ))
-                              : null}
+                                )) : null}
                           </SelectContent>
                         </Select>
                       ) : (
@@ -802,83 +862,133 @@ export default function ClientesPage() {
                 : (editingId ? 'Modifica los datos del contacto.' : 'Captura los datos del contacto para comenzar el seguimiento.')}
             </DialogDescription>
           </DialogHeader>
-          <form className="space-y-4" onSubmit={handleLeadSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="lead-cedula">Cédula</Label>
-              <Input
-                id="lead-cedula"
-                value={leadFormValues.cedula}
-                onChange={handleLeadFieldChange("cedula")}
-                placeholder="0-0000-0000"
-                disabled={isViewOnly}
-              />
-              {!isViewOnly && <p className="text-xs text-muted-foreground">Al ingresar la cédula completaremos los datos desde el TSE.</p>}
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
+          <Form {...form}>
+            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="space-y-2">
-                <Label htmlFor="lead-name">Nombre</Label>
-                <Input id="lead-name" value={leadFormValues.name} onChange={handleLeadFieldChange("name")} required disabled={isViewOnly} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lead-apellido1">Primer apellido</Label>
-                <Input
-                  id="lead-apellido1"
-                  value={leadFormValues.apellido1}
-                  onChange={handleLeadFieldChange("apellido1")}
-                  disabled={isViewOnly}
+                <FormField
+                  control={form.control}
+                  name="cedula"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cédula</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="0-0000-0000"
+                          disabled={isViewOnly}
+                          {...field}
+                        />
+                      </FormControl>
+                      {!isViewOnly && <p className="text-xs text-muted-foreground">Al ingresar la cédula completaremos los datos desde el TSE.</p>}
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="lead-apellido2">Segundo apellido</Label>
-                <Input
-                  id="lead-apellido2"
-                  value={leadFormValues.apellido2}
-                  onChange={handleLeadFieldChange("apellido2")}
-                  disabled={isViewOnly}
+              <div className="grid gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre</FormLabel>
+                      <FormControl>
+                        <Input required disabled={isViewOnly} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="apellido1"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Primer apellido</FormLabel>
+                      <FormControl>
+                        <Input disabled={isViewOnly} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="apellido2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Segundo apellido</FormLabel>
+                      <FormControl>
+                        <Input disabled={isViewOnly} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="lead-email">Correo</Label>
-                <Input
-                  id="lead-email"
-                  type="email"
-                  value={leadFormValues.email}
-                  onChange={handleLeadFieldChange("email")}
-                  required
-                  disabled={isViewOnly}
+              <div className="grid gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Correo</FormLabel>
+                      <FormControl>
+                        <Input type="email" required disabled={isViewOnly} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Teléfono</FormLabel>
+                      <FormControl>
+                        <Input disabled={isViewOnly} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="fechaNacimiento"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Fecha de nacimiento</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="DD-MM-AAAA"
+                          disabled={isViewOnly}
+                          maxLength={10}
+                          {...field}
+                          onChange={(e) => {
+                            handleDateChange(e);
+                            field.onChange(e); // Propagate to react-hook-form
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="lead-phone">Teléfono</Label>
-                <Input id="lead-phone" value={leadFormValues.phone} onChange={handleLeadFieldChange("phone")} disabled={isViewOnly} />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="lead-birthdate">Fecha de nacimiento</Label>
-                <Input
-                  id="lead-birthdate"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="DD-MM-AAAA"
-                  value={leadFormValues.fechaNacimiento}
-                  onChange={handleDateChange}
-                  disabled={isViewOnly}
-                  maxLength={10}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={closeLeadDialog} disabled={isSavingLead}>
-                {isViewOnly ? "Cerrar" : "Cancelar"}
-              </Button>
-              {!isViewOnly && (
-                <Button type="submit" disabled={isSavingLead}>
-                  {isSavingLead ? "Guardando..." : "Crear lead"}
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={closeLeadDialog} disabled={isSavingLead}>
+                  {isViewOnly ? "Cerrar" : "Cancelar"}
                 </Button>
-              )}
-            </DialogFooter>
-          </form>
+                {!isViewOnly && (
+                  <Button type="submit" disabled={isSavingLead}>
+                    {isSavingLead ? "Guardando..." : "Crear lead"}
+                  </Button>
+                )}
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -928,10 +1038,10 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
   const handleOpenUploadDialog = async (leadId: string, leadCedula?: string) => {
     // Verificar si el lead tiene cédula
     if (!leadCedula) {
-      toast({ 
+      toast({
         title: "Error", 
         description: "El lead no tiene cédula registrada. No se puede subir archivos.", 
-        variant: "destructive" 
+        variant: "destructive"
       });
       return;
     }
@@ -944,10 +1054,10 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
       });
 
       if (checkRes.data?.has_files) {
-        toast({ 
+        toast({
           title: "Archivos ya existen", 
           description: `Ya se han subido ${checkRes.data.files_count} archivo(s) para la cédula ${leadCedula}. No se permiten duplicados.`, 
-          variant: "destructive" 
+          variant: "destructive"
         });
         setCheckingDuplicate(false);
         return;
@@ -1008,10 +1118,10 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
         
         // Verificar si el backend rechazó por duplicado
         if (res.data?.already_uploaded) {
-          toast({ 
+          toast({
             title: "Ya existen archivos", 
             description: res.data.message || "No se permiten duplicados.", 
-            variant: "destructive" 
+            variant: "destructive"
           });
           setUploadDialogOpen(null);
           setCurrentLeadCedula(null);
@@ -1032,10 +1142,10 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
           
           // Verificar si el backend rechazó por duplicado
           if (res.data?.already_uploaded) {
-            toast({ 
+            toast({
               title: "Ya existen archivos", 
               description: res.data.message || "No se permiten duplicados.", 
-              variant: "destructive" 
+              variant: "destructive"
             });
             setUploadDialogOpen(null);
             setCurrentLeadCedula(null);
@@ -1058,10 +1168,10 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
           });
           
           if (folderRes.data?.already_exists) {
-            toast({ 
+            toast({
               title: "Carpeta ya existe", 
               description: folderRes.data.message || "Ya existen archivos para esta cédula.", 
-              variant: "destructive" 
+              variant: "destructive"
             });
             setUploadDialogOpen(null);
             setCurrentLeadCedula(null);
@@ -1069,10 +1179,10 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
           }
         } catch (e: any) {
           if (e.response?.status === 409) {
-            toast({ 
+            toast({
               title: "Carpeta ya existe", 
               description: e.response?.data?.message || "Ya existen archivos para esta cédula.", 
-              variant: "destructive" 
+              variant: "destructive"
             });
             setUploadDialogOpen(null);
             setCurrentLeadCedula(null);
@@ -1088,10 +1198,10 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
     } catch (err: any) {
       // Manejar error 409 del backend
       if (err.response?.status === 409) {
-        toast({ 
+        toast({
           title: "Ya existen archivos", 
           description: err.response?.data?.message || "No se permiten duplicados para esta cédula.", 
-          variant: "destructive" 
+          variant: "destructive"
         });
         setUploadDialogOpen(null);
         setCurrentLeadCedula(null);
