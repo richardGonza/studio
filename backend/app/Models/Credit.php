@@ -32,7 +32,8 @@ class Credit extends Model
         'tasa_anual',
         'plazo',
         'cuotas_atrasadas',
-        'deductora_id'
+        'deductora_id',
+        'poliza'
     ];
 
     protected $casts = [
@@ -45,6 +46,7 @@ class Credit extends Model
         'cuota' => 'decimal:2',
         'movimiento_amortizacion' => 'decimal:2',
         'tasa_anual' => 'decimal:2',
+        'poliza' => 'boolean',
     ];
 
     /**

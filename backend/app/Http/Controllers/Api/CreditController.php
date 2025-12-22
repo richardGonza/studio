@@ -57,6 +57,7 @@ class CreditController extends Controller
             'plazo' => 'required|integer|min:1',
             'tasa_anual' => 'nullable|numeric',
             'fecha_primera_cuota' => 'nullable|date',
+            'poliza' => 'nullable|boolean',
         ]);
 
         // Tasa por defecto
@@ -282,6 +283,7 @@ class CreditController extends Controller
             'status' => 'sometimes|required|string',
             'monto_credito' => 'nullable|numeric',
             'tasa_anual' => 'nullable|numeric',
+            'poliza' => 'nullable|boolean',
              // ... resto de campos si es necesario editar
         ]);
 

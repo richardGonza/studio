@@ -59,7 +59,7 @@ interface DeductoraOption {
   id: string | number;
   nombre: string;
 }
-  
+
 
 interface ClientOption {
   id: string;
@@ -269,7 +269,7 @@ function formatDateTime(dateString?: string | null): string {
 export default function CreditsPage() {
   const { toast } = useToast();
   const [deductoras, setDeductoras] = useState<DeductoraOption[]>([]);
-  
+
   const [credits, setCredits] = useState<CreditItem[]>([]);
   const [leads, setLeads] = useState<ClientOption[]>([]);
   const [opportunities, setOpportunities] = useState<OpportunityOption[]>([]);
@@ -363,7 +363,7 @@ export default function CreditsPage() {
       console.error("Error fetching deductoras:", error);
     }
   }, []);
-    
+
   const fetchCredits = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -408,7 +408,7 @@ export default function CreditsPage() {
       setIsLoadingLeads(true);
       const response = await api.get('/api/leads');
       const data = response.data.data || response.data;
-      setLeads(data.map((l: any) => ({ id: l.id, name: l.name, email: l.email, cedula: l.cedula, deductora_id:l.deductora_id })));
+      setLeads(data.map((l: any) => ({ id: l.id, name: l.name, email: l.email, cedula: l.cedula, deductora_id: l.deductora_id })));
     } catch (error) {
       console.error("Error fetching leads:", error);
     } finally {
@@ -802,17 +802,7 @@ export default function CreditsPage() {
             <PopoverContent className="w-80">
               <div className="grid gap-4">
                 <div className="space-y-2">
-                                <Label htmlFor="poliza">¿Tiene póliza?</Label>
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    id="poliza"
-                                    type="checkbox"
-                                    checked={formValues.poliza}
-                                    onChange={e => setFormValues({ ...formValues, poliza: e.target.checked })}
-                                    className="form-checkbox h-5 w-5 text-primary border-gray-300 rounded"
-                                  />
-                                  <span className="text-sm">Cliente cuenta con póliza</span>
-                                </div>
+
                   <h4 className="font-medium leading-none">Filtros</h4>
                   <p className="text-sm text-muted-foreground">
                     Filtra los créditos por los siguientes criterios.
@@ -918,7 +908,7 @@ export default function CreditsPage() {
                       {getCreditsForTab(tab.value).map((credit) => {
                         // --- LÓGICA CALCULADA EN FRONTEND ---
                         const pagosOrdenados = credit.plan_de_pagos?.length
-                          ? [...credit.plan_de_pagos].filter((e)=>e.cuota > 0).sort((a, b) => a.numero_cuota - b.numero_cuota)
+                          ? [...credit.plan_de_pagos].filter((e) => e.cuota > 0).sort((a, b) => a.numero_cuota - b.numero_cuota)
                           : [];
 
 
@@ -926,7 +916,7 @@ export default function CreditsPage() {
                         const fechaInicio = pagosOrdenados.length > 0 ? pagosOrdenados[0].fecha_corte : null;
 
                         // 2. Vencimiento: De cabecera o la última cuota
-                        const fechaFin = credit.fecha_culminacion_credito ;
+                        const fechaFin = credit.fecha_culminacion_credito;
 
                         // 3. Tasa: De cabecera o del primer pago
                         const tasa = credit.tasa_anual || (pagosOrdenados.length > 0 ? pagosOrdenados[0].tasa_actual : null);
@@ -962,7 +952,7 @@ export default function CreditsPage() {
 
                             <TableCell>{credit.cuotas_atrasadas || 0}</TableCell>
                             <TableCell>
-                                {deductoras.find(d => d.id === credit.lead?.deductora_id)?.nombre || "-"}
+                              {deductoras.find(d => d.id === credit.lead?.deductora_id)?.nombre || "-"}
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center gap-2">
@@ -1093,6 +1083,17 @@ export default function CreditsPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <Label htmlFor="poliza">¿Tiene póliza?</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  id="poliza"
+                  type="checkbox"
+                  checked={formValues.poliza}
+                  onChange={e => setFormValues({ ...formValues, poliza: e.target.checked })}
+                  className="form-checkbox h-5 w-5 text-primary border-gray-300 rounded"
+                />
+                <span className="text-sm">Cliente cuenta con póliza</span>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="category">Categoría</Label>
                 <Select value={formValues.category} onValueChange={v => setFormValues({ ...formValues, category: v })}>
@@ -1125,21 +1126,21 @@ export default function CreditsPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="plazo">Plazo (Meses)</Label>
-                  <Input
-                    id="plazo"
-                    type="number"
-                    min={1}
-                    max={120}
-                    value={formValues.plazo}
-                    onChange={e => {
-                      let value = e.target.value;
-                      // Limitar el valor entre 1 y 120
-                      if (Number(value) < 1) value = "1";
-                      if (Number(value) > 120) value = "120";
-                      setFormValues({ ...formValues, plazo: value });
-                    }}
-                    placeholder="Plazo en meses"
-                  />
+                <Input
+                  id="plazo"
+                  type="number"
+                  min={1}
+                  max={120}
+                  value={formValues.plazo}
+                  onChange={e => {
+                    let value = e.target.value;
+                    // Limitar el valor entre 1 y 120
+                    if (Number(value) < 1) value = "1";
+                    if (Number(value) > 120) value = "120";
+                    setFormValues({ ...formValues, plazo: value });
+                  }}
+                  placeholder="Plazo en meses"
+                />
               </div>
               <div className="space-y-2 flex flex-col">
                 <Label htmlFor="lead">Lead</Label>
@@ -1415,19 +1416,19 @@ function CreditDocumentsDialog({ isOpen, credit, onClose, canDownloadDocuments, 
                   <TableCell>
                     {(() => {
                       // 1. AGREGA ESTA LÍNEA: Si credit es null, retorna guion y no ejecutes lo demás
-                      if (!credit) return "-"; 
+                      if (!credit) return "-";
 
                       // 2. Ahora TypeScript sabe que credit existe, pero mantén los '?' por seguridad en lead/client
                       const dedId = credit.lead?.deductora_id || credit.client?.deductora_id || credit.deductora_id;
-                      
+
                       if (!dedId) return "-";
-                      
+
                       const found = deductoras.find(d => String(d.id) === String(dedId));
                       return found ? found.nombre : dedId;
                     })()}
                   </TableCell>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(doc.id)} className="text-destructive">Eliminar</Button>
-                  
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(doc.id)} className="text-destructive">Eliminar</Button>
+
                 </TableRow>
               ))}
             </TableBody>
