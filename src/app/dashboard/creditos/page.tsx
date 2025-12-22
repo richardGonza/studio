@@ -204,7 +204,9 @@ const CREDIT_STATUS_OPTIONS = [
   "Activo",
   "Mora",
   "Cerrado",
-  "Legal"
+  "Legal",
+  "Aprobado",
+  "Formalizado"
 ] as const;
 const CREDIT_CATEGORY_OPTIONS = ["Regular", "Micro-crédito", "Hipotecario", "Personal"] as const;
 const CURRENCY_OPTIONS = [
@@ -918,7 +920,20 @@ export default function CreditsPage() {
 
                         return (
                           <TableRow key={credit.id}>
-                            <TableCell><Badge variant="secondary">{credit.status}</Badge></TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">{credit.status}</Badge>
+                              {credit.status !== 'Formalizado' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="ml-2"
+                                  onClick={async () => {
+                                    await api.put(`/api/credits/${credit.id}`, { status: 'Formalizado' });
+                                    window.location.reload();
+                                  }}
+                                >Formalizar</Button>
+                              )}
+                            </TableCell>
                             <TableCell>{credit.client?.name || credit.lead?.name || "-"}</TableCell>
                             <TableCell className="font-medium">
                               <Link href={`/dashboard/creditos/${credit.id}`} className="hover:underline text-primary">

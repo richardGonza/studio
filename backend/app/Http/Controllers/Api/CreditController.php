@@ -64,15 +64,16 @@ class CreditController extends Controller
             $validated['tasa_anual'] = 33.50;
         }
 
-        $credit = DB::transaction(function () use ($validated) {
 
+        $credit = DB::transaction(function () use ($validated) {
             // A. Crear Cabecera
-            // IMPORTANTE: No pasamos 'saldo' manualmente porque tu modelo Credit
-            // en el método boot() ya hace: $credit->saldo = $credit->monto_credito;
             $credit = Credit::create($validated);
 
-            // B. Generar la Tabla de Amortización Inicial (Cuotas 1 a N)
-            $this->generateAmortizationSchedule($credit);
+            // Validar estado antes de crear plan de pagos
+            if (strtolower($credit->status) === 'formalizado') {
+                // B. Generar la Tabla de Amortización Inicial (Cuotas 1 a N)
+                $this->generateAmortizationSchedule($credit);
+            }
 
             // C. Copiar documentos del Lead
             $lead = Lead::with('documents')->find($validated['lead_id']);
@@ -88,7 +89,6 @@ class CreditController extends Controller
                     ]);
                 }
             }
-
             return $credit;
         });
 
