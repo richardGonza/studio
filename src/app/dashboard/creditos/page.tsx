@@ -1090,7 +1090,7 @@ export default function CreditsPage() {
                   type="checkbox"
                   checked={formValues.poliza}
                   onChange={e => setFormValues({ ...formValues, poliza: e.target.checked })}
-                  className="form-checkbox h-5 w-5 text-primary border-gray-300 rounded"
+                  className="form-checkbox h-2 w-2 text-primary border-gray-300 rounded"
                 />
                 <span className="text-sm">Cliente cuenta con póliza</span>
               </div>
