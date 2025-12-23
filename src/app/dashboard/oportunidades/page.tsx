@@ -819,18 +819,6 @@ export default function DealsPage() {
               </div>
             </div>
             <Button variant="outline" onClick={handleClearFilters} disabled={!hasActiveFilters}>Limpiar filtros</Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="secondary" className="gap-2">
-                  <Download className="h-4 w-4" />
-                  Exportar
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleExportCSV}>Descargar CSV</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleExportPDF}>Descargar PDF</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </CardHeader>
