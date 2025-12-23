@@ -83,7 +83,12 @@ const opportunitySchema = z.object({
   opportunityType: z.string(),
   status: z.string(),
   amount: z.coerce.number().min(0, "El monto debe ser positivo"),
-  expectedCloseDate: z.string().optional(),
+  expectedCloseDate: z.string().optional().refine((date) => {
+    if (!date) return true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return new Date(date) >= today;
+  }, { message: "La fecha no puede ser anterior a hoy" }),
   comments: z.string().optional(),
 });
 
