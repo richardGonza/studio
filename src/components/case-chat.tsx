@@ -1,6 +1,7 @@
 // 'use client' indica que es un Componente de Cliente, lo que permite el uso de interactividad y estado.
 'use client';
 
+import { useState, useEffect } from 'react';
 import {
   List,
   MessageCircle,
@@ -14,11 +15,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  chatMessages,
   internalNotes,
   type ChatMessage,
   type InternalNote,
 } from '@/lib/data'; // Importamos los datos de ejemplo.
+import api from '@/lib/axios';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Componente para renderizar la lista de mensajes de un chat.
@@ -173,10 +175,48 @@ function CombinedChatList({
  * @param {{ conversationId: string }} props - El ID de la conversación a mostrar.
  */
 export function CaseChat({ conversationId }: { conversationId: string }) {
-  // Filtramos los mensajes y notas que pertenecen a la conversación actual.
-  const relevantMessages = chatMessages.filter(
-    (msg) => msg.conversationId === conversationId
-  );
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Cargar mensajes desde la API
+  useEffect(() => {
+    const fetchMessages = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get('/api/chat-messages', {
+          params: { conversation_id: conversationId }
+        });
+
+        if (response.data.success && Array.isArray(response.data.data)) {
+          // Mapear los mensajes de la API al formato esperado por el frontend
+          const mappedMessages: ChatMessage[] = response.data.data.map((msg: any) => ({
+            id: String(msg.id),
+            conversationId: msg.conversation_id,
+            senderType: msg.sender_type,
+            senderName: msg.sender_name || 'Sistema',
+            avatarUrl: '', // Podemos mejorar esto después
+            text: msg.text,
+            time: new Date(msg.created_at).toLocaleTimeString('es-ES', {
+              hour: '2-digit',
+              minute: '2-digit'
+            }),
+          }));
+          setMessages(mappedMessages);
+        }
+      } catch (error) {
+        console.error('Error cargando mensajes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (conversationId) {
+      fetchMessages();
+    }
+  }, [conversationId]);
+
+  // Filtrar notas internas (todavía usando datos mock)
   const relevantNotes = internalNotes.filter(
     (note) => note.conversationId === conversationId
   );
@@ -204,17 +244,25 @@ export function CaseChat({ conversationId }: { conversationId: string }) {
             value="all"
             className="flex-1 space-y-4 overflow-y-auto p-4 min-h-0"
           >
-            <CombinedChatList
-              messages={relevantMessages}
-              notes={relevantNotes}
-            />
+            {loading ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">Cargando mensajes...</div>
+            ) : (
+              <CombinedChatList
+                messages={messages}
+                notes={relevantNotes}
+              />
+            )}
           </TabsContent>
           {/* Contenido de la pestaña "Mensajes". */}
           <TabsContent
             value="messages"
             className="flex-1 space-y-4 overflow-y-auto p-4 min-h-0"
           >
-            <ChatMessagesList messages={relevantMessages} />
+            {loading ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">Cargando mensajes...</div>
+            ) : (
+              <ChatMessagesList messages={messages} />
+            )}
           </TabsContent>
           {/* Contenido de la pestaña "Comentarios". */}
           <TabsContent
