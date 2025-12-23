@@ -169,6 +169,8 @@ function CombinedChatList({
   );
 }
 
+import { getAuthUser } from '@/lib/auth';
+
 /**
  * Componente principal del panel de chat de un caso.
  * Filtra los mensajes y notas relevantes y los muestra en pestañas.
@@ -178,43 +180,85 @@ export function CaseChat({ conversationId }: { conversationId: string }) {
   const { toast } = useToast();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const user = getAuthUser();
 
-  // Cargar mensajes desde la API
-  useEffect(() => {
-    const fetchMessages = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get('/api/chat-messages', {
-          params: { conversation_id: conversationId }
-        });
+  // Función para cargar mensajes
+  const fetchMessages = async () => {
+    // Solo mostramos loading si no hay mensajes previos (carga inicial)
+    if (messages.length === 0) setLoading(true);
+    try {
+      const response = await api.get('/api/chat-messages', {
+        params: { conversation_id: conversationId }
+      });
 
-        if (response.data.success && Array.isArray(response.data.data)) {
-          // Mapear los mensajes de la API al formato esperado por el frontend
-          const mappedMessages: ChatMessage[] = response.data.data.map((msg: any) => ({
-            id: String(msg.id),
-            conversationId: msg.conversation_id,
-            senderType: msg.sender_type,
-            senderName: msg.sender_name || 'Sistema',
-            avatarUrl: '', // Podemos mejorar esto después
-            text: msg.text,
-            time: new Date(msg.created_at).toLocaleTimeString('es-ES', {
-              hour: '2-digit',
-              minute: '2-digit'
-            }),
-          }));
-          setMessages(mappedMessages);
-        }
-      } catch (error) {
-        console.error('Error cargando mensajes:', error);
-      } finally {
-        setLoading(false);
+      if (response.data.success && Array.isArray(response.data.data)) {
+        const mappedMessages: ChatMessage[] = response.data.data.map((msg: any) => ({
+          id: String(msg.id),
+          conversationId: msg.conversation_id,
+          senderType: msg.sender_type,
+          senderName: msg.sender_name || 'Sistema',
+          avatarUrl: '', // Podríamos generar un avatar por defecto
+          text: msg.text,
+          time: new Date(msg.created_at).toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+        }));
+        setMessages(mappedMessages);
       }
-    };
+    } catch (error) {
+      console.error('Error cargando mensajes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Cargar mensajes iniciales
+  useEffect(() => {
     if (conversationId) {
       fetchMessages();
     }
   }, [conversationId]);
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || isSending) return;
+
+    setIsSending(true);
+    try {
+      const payload = {
+        conversation_id: conversationId,
+        sender_type: 'agent',
+        sender_name: user?.name || 'Agente',
+        text: newMessage,
+        message_type: 'text'
+      };
+
+      const response = await api.post('/api/chat-messages', payload);
+
+      if (response.data.success) {
+        setNewMessage("");
+        await fetchMessages();
+      }
+    } catch (error) {
+      console.error('Error enviando mensaje:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo enviar el mensaje.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   // Filtrar notas internas (todavía usando datos mock)
   const relevantNotes = internalNotes.filter(
@@ -277,19 +321,23 @@ export function CaseChat({ conversationId }: { conversationId: string }) {
             <div className="relative">
               <Textarea
                 placeholder="Escribe tu mensaje..."
-                className="pr-20"
+                className="pr-20 resize-none"
                 rows={2}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isSending}
               />
               <div className="absolute bottom-2 right-2 flex items-center gap-1">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" disabled={isSending}>
                   <Paperclip className="h-4 w-4" />
                   <span className="sr-only">Adjuntar</span>
                 </Button>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" disabled={isSending}>
                   <Smile className="h-4 w-4" />
                   <span className="sr-only">Emoji</span>
                 </Button>
-                <Button size="icon">
+                <Button size="icon" onClick={handleSendMessage} disabled={isSending || !newMessage.trim()}>
                   <Send className="h-4 w-4" />
                   <span className="sr-only">Enviar</span>
                 </Button>
