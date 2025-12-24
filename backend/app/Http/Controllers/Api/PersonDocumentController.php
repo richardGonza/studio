@@ -7,17 +7,11 @@ use App\Models\PersonDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Support\Facades\Log;
+
 class PersonDocumentController extends Controller
 {
-    public function index(Request $request)
-    {
-        $request->validate([
-            'person_id' => 'required|exists:persons,id',
-        ]);
-
-        $documents = PersonDocument::where('person_id', $request->person_id)->get();
-        return response()->json($documents);
-    }
+    // ...
 
     public function checkCedulaFolder(Request $request)
     {
@@ -25,22 +19,32 @@ class PersonDocumentController extends Controller
             'cedula' => 'required|string',
         ]);
 
-        $cedula = preg_replace('/[^0-9]/', '', $request->cedula);
-        if (empty($cedula)) {
+        $rawCedula = $request->cedula;
+        $strippedCedula = preg_replace('/[^0-9]/', '', $request->cedula);
+        
+        Log::info("Checking cedula folder/records for: {$rawCedula} (Stripped: {$strippedCedula})");
+
+        if (empty($strippedCedula)) {
             return response()->json(['exists' => false]);
         }
 
-        $folder = "documents/{$cedula}"; // Assuming standardized path
-        // In the new model, we rely on DB records more than folders, but for compatibility:
-        $exists = Storage::disk('public')->exists($folder);
+        $folder = "documents/{$strippedCedula}"; 
+        $legacyFolder = "documentos/{$strippedCedula}";
+
+        $exists = Storage::disk('public')->exists($folder) || Storage::disk('public')->exists($legacyFolder);
         
-        // Also check if there are database records
-        $hasRecords = PersonDocument::whereHas('person', function($q) use ($cedula) {
-            $q->where('cedula', $cedula);
+        $hasRecords = PersonDocument::whereHas('person', function($q) use ($strippedCedula, $rawCedula) {
+            $q->where('cedula', $strippedCedula)
+              ->orWhere('cedula', $rawCedula);
         })->exists();
+
+        Log::info("Result - Folder: " . ($exists ? 'Yes' : 'No') . ", DB Records: " . ($hasRecords ? 'Yes' : 'No'));
 
         return response()->json(['exists' => $exists || $hasRecords]);
     }
+    
+    // ...
+}
 
     public function store(Request $request)
     {
