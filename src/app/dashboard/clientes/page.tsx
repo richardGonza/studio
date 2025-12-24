@@ -1049,14 +1049,14 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
     setCheckingDuplicate(true);
     try {
       // Verificar si ya existe carpeta con archivos para esta cédula
-      const checkRes = await api.get('/api/leads/check-cedula-folder', {
+      const checkRes = await api.get('/api/person-documents/check-cedula-folder', {
         params: { cedula: leadCedula }
       });
 
-      if (checkRes.data?.has_files) {
+      if (checkRes.data?.exists) { // Updated to check 'exists' which covers DB records
         toast({
           title: "Archivos ya existen", 
-          description: `Ya se han subido ${checkRes.data.files_count} archivo(s) para la cédula ${leadCedula}. No se permiten duplicados.`, 
+          description: `Ya existen archivos para la cédula ${leadCedula}. No se permiten duplicados.`, 
           variant: "destructive"
         });
         setCheckingDuplicate(false);
@@ -1106,29 +1106,14 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
     if (!uploadDialogOpen) return;
     setUploading(true);
     try {
-      const uploadedFilePaths: string[] = [];
-      
       // Subir constancia
       if (constanciaFile) {
         const formData = new FormData();
         formData.append('file', constanciaFile);
-        const res = await api.post(`/api/leads/${uploadDialogOpen}/documents`, formData, {
+        formData.append('person_id', uploadDialogOpen); // Added person_id
+        await api.post('/api/person-documents', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        
-        // Verificar si el backend rechazó por duplicado
-        if (res.data?.already_uploaded) {
-          toast({
-            title: "Ya existen archivos", 
-            description: res.data.message || "No se permiten duplicados.", 
-            variant: "destructive"
-          });
-          setUploadDialogOpen(null);
-          setCurrentLeadCedula(null);
-          return;
-        }
-        
-        if (res.data && res.data.path) uploadedFilePaths.push(res.data.path);
       }
       
       // Subir archivos adicionales
@@ -1136,59 +1121,10 @@ function LeadsTable({ data, onAction }: LeadsTableProps) {
         for (const file of multiFiles) {
           const formData = new FormData();
           formData.append('file', file);
-          const res = await api.post(`/api/leads/${uploadDialogOpen}/documents`, formData, {
+          formData.append('person_id', uploadDialogOpen); // Added person_id
+          await api.post('/api/person-documents', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
-          
-          // Verificar si el backend rechazó por duplicado
-          if (res.data?.already_uploaded) {
-            toast({
-              title: "Ya existen archivos", 
-              description: res.data.message || "No se permiten duplicados.", 
-              variant: "destructive"
-            });
-            setUploadDialogOpen(null);
-            setCurrentLeadCedula(null);
-            return;
-          }
-          
-          if (res.data && res.data.path) uploadedFilePaths.push(res.data.path);
-        }
-      }
-
-      // Usar la cédula que ya tenemos guardada
-      const cedula = currentLeadCedula;
-
-      // Crear carpeta y mover archivos
-      if (cedula && uploadedFilePaths.length > 0) {
-        try {
-          const folderRes = await api.post('/api/leads/create-cedula-folder', {
-            cedula,
-            files: uploadedFilePaths,
-          });
-          
-          if (folderRes.data?.already_exists) {
-            toast({
-              title: "Carpeta ya existe", 
-              description: folderRes.data.message || "Ya existen archivos para esta cédula.", 
-              variant: "destructive"
-            });
-            setUploadDialogOpen(null);
-            setCurrentLeadCedula(null);
-            return;
-          }
-        } catch (e: any) {
-          if (e.response?.status === 409) {
-            toast({
-              title: "Carpeta ya existe", 
-              description: e.response?.data?.message || "Ya existen archivos para esta cédula.", 
-              variant: "destructive"
-            });
-            setUploadDialogOpen(null);
-            setCurrentLeadCedula(null);
-            return;
-          }
-          toast({ title: "Advertencia", description: "No se pudo crear la carpeta por cédula.", variant: "destructive" });
         }
       }
 

@@ -76,18 +76,44 @@ class CreditController extends Controller
                 $this->generateAmortizationSchedule($credit);
             }
 
-            // C. Copiar documentos del Lead
+            // C. MOVER documentos del Lead (Buzón) al Crédito (Expediente)
             $lead = Lead::with('documents')->find($validated['lead_id']);
             if ($lead && $lead->documents->count() > 0) {
-                foreach ($lead->documents as $leadDocument) {
-                    $credit->documents()->create([
-                        'name' => $leadDocument->name,
-                        'notes' => $leadDocument->notes,
-                        'path' => $leadDocument->path,
-                        'url' => $leadDocument->url,
-                        'mime_type' => $leadDocument->mime_type,
-                        'size' => $leadDocument->size,
-                    ]);
+                foreach ($lead->documents as $personDocument) {
+                    // 1. Definir nueva ruta
+                    $fileName = basename($personDocument->path);
+                    $newPath = "credit-docs/{$credit->id}/{$fileName}";
+
+                    // 2. Mover archivo físico
+                    if (Storage::disk('public')->exists($personDocument->path)) {
+                        // Crear directorio si no existe
+                        if (!Storage::disk('public')->exists("credit-docs/{$credit->id}")) {
+                            Storage::disk('public')->makeDirectory("credit-docs/{$credit->id}");
+                        }
+                        
+                        // Si el archivo destino ya existe, renombrar (timestamp)
+                        if (Storage::disk('public')->exists($newPath)) {
+                            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+                            $nameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
+                            $timestamp = now()->format('Ymd_His');
+                            $newPath = "credit-docs/{$credit->id}/{$nameWithoutExt}_{$timestamp}.{$extension}";
+                        }
+
+                        Storage::disk('public')->move($personDocument->path, $newPath);
+
+                        // 3. Crear CreditDocument
+                        $credit->documents()->create([
+                            'name' => $personDocument->name,
+                            'notes' => $personDocument->notes,
+                            'path' => $newPath,
+                            'url' => asset(Storage::url($newPath)),
+                            'mime_type' => $personDocument->mime_type,
+                            'size' => $personDocument->size,
+                        ]);
+
+                        // 4. Eliminar del Buzón (PersonDocument)
+                        $personDocument->delete();
+                    }
                 }
             }
             return $credit;

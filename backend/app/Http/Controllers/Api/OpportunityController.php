@@ -94,14 +94,10 @@ class OpportunityController extends Controller
     }
 
     /**
-     * Mover archivos de la carpeta de cédula a la carpeta de oportunidad.
-     *
-     * Estructura:
-     * ANTES:  documentos/{cedula}/archivo1.pdf, archivo2.pdf
-     * DESPUÉS: documentos/{cedula}/{id}/archivo1.pdf, archivo2.pdf
+     * Mover archivos del Buzón del Cliente (PersonDocument) al Expediente de la Oportunidad.
      *
      * @param string $cedula
-     * @param int $opportunityId
+     * @param string $opportunityId
      * @return array
      */
     private function moveFilesToOpportunityFolder(string $cedula, string $opportunityId): array
@@ -109,87 +105,85 @@ class OpportunityController extends Controller
         $cedula = preg_replace('/[^0-9]/', '', $cedula);
 
         if (empty($cedula)) {
-            Log::warning('No se pudo mover archivos: cédula vacía', [
-                'opportunity_id' => $opportunityId
-            ]);
             return ['success' => false, 'message' => 'Cédula vacía'];
         }
 
-        $cedulaFolder = "documentos/{$cedula}";
+        // Buscar la Persona (Lead/Cliente) por cédula
+        $person = \App\Models\Person::where('cedula', $cedula)->first();
+
+        if (!$person) {
+            Log::info('Persona no encontrada para mover archivos', ['cedula' => $cedula]);
+            return ['success' => true, 'message' => 'Persona no encontrada', 'files' => []];
+        }
+
+        $personDocuments = $person->documents;
+
+        if ($personDocuments->isEmpty()) {
+            return ['success' => true, 'message' => 'No hay documentos en el buzón', 'files' => []];
+        }
+
         $opportunityFolder = "documentos/{$cedula}/{$opportunityId}";
         $movedFiles = [];
 
         try {
-            // Verificar si existe la carpeta de cédula
-            if (!Storage::disk('public')->exists($cedulaFolder)) {
-                Log::info('No existe carpeta de cédula para mover archivos', [
-                    'cedula_folder' => $cedulaFolder
-                ]);
-                return ['success' => true, 'message' => 'No hay archivos para mover', 'files' => []];
-            }
-
-            // Obtener archivos de la carpeta de cédula (solo archivos, no subcarpetas)
-            $files = Storage::disk('public')->files($cedulaFolder);
-
-            if (empty($files)) {
-                Log::info('La carpeta de cédula está vacía', [
-                    'cedula_folder' => $cedulaFolder
-                ]);
-                return ['success' => true, 'message' => 'No hay archivos para mover', 'files' => []];
-            }
-
             // Crear carpeta de oportunidad si no existe
             if (!Storage::disk('public')->exists($opportunityFolder)) {
                 Storage::disk('public')->makeDirectory($opportunityFolder);
             }
 
-            // Mover cada archivo a la carpeta de oportunidad
-            foreach ($files as $filePath) {
-                $fileName = basename($filePath);
-                $newPath = "{$opportunityFolder}/{$fileName}";
-
-                // Si ya existe un archivo con el mismo nombre, agregar timestamp
-                if (Storage::disk('public')->exists($newPath)) {
-                    $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-                    $nameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
-                    $timestamp = now()->format('Ymd_His');
-                    $fileName = "{$nameWithoutExt}_{$timestamp}.{$extension}";
+            foreach ($personDocuments as $doc) {
+                // Verificar existencia física
+                if (Storage::disk('public')->exists($doc->path)) {
+                    $fileName = basename($doc->path);
                     $newPath = "{$opportunityFolder}/{$fileName}";
-                }
 
-                try {
-                    // Mover el archivo
-                    Storage::disk('public')->move($filePath, $newPath);
-                    $movedFiles[] = [
-                        'original' => $filePath,
-                        'new' => $newPath
-                    ];
+                    // Manejo de colisiones de nombre
+                    if (Storage::disk('public')->exists($newPath)) {
+                        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+                        $nameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
+                        $timestamp = now()->format('Ymd_His');
+                        $fileName = "{$nameWithoutExt}_{$timestamp}.{$extension}";
+                        $newPath = "{$opportunityFolder}/{$fileName}";
+                    }
 
-                    Log::info('Archivo movido a carpeta de oportunidad', [
-                        'from' => $filePath,
-                        'to' => $newPath
-                    ]);
-                } catch (\Exception $e) {
-                    Log::error('Error moviendo archivo a carpeta de oportunidad', [
-                        'file' => $filePath,
-                        'new_path' => $newPath,
-                        'error' => $e->getMessage(),
-                        'opportunity_id' => $opportunityId,
-                        'cedula' => $cedula
-                    ]);
+                    try {
+                        // 1. Mover físicamente
+                        Storage::disk('public')->move($doc->path, $newPath);
+                        
+                        $movedFiles[] = [
+                            'original' => $doc->path,
+                            'new' => $newPath
+                        ];
+
+                        // 2. Eliminar registro del Buzón (PersonDocument)
+                        $doc->delete();
+
+                        Log::info('Archivo movido de Buzón a Oportunidad', [
+                            'from' => $doc->path,
+                            'to' => $newPath
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error('Error moviendo archivo individual', [
+                            'file' => $doc->path,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                } else {
+                    // Si el archivo físico no existe pero el registro sí, eliminamos el registro huérfano
+                    Log::warning('Archivo físico no encontrado, eliminando registro huérfano', ['path' => $doc->path]);
+                    $doc->delete();
                 }
             }
 
             return [
                 'success' => true,
-                'message' => 'Archivos movidos correctamente',
-                'cedula_folder' => $cedulaFolder,
-                'opportunity_folder' => $opportunityFolder,
+                'message' => 'Archivos movidos al expediente correctamente',
                 'files_count' => count($movedFiles),
                 'files' => $movedFiles
             ];
+
         } catch (\Exception $e) {
-            Log::error('Error moviendo archivos a carpeta de oportunidad', [
+            Log::error('Error general moviendo archivos a oportunidad', [
                 'cedula' => $cedula,
                 'opportunity_id' => $opportunityId,
                 'error' => $e->getMessage()

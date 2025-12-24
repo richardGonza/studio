@@ -8,7 +8,6 @@ use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\OpportunityController;
 use App\Http\Controllers\Api\PersonDocumentController;
 use App\Http\Controllers\Api\CreditPaymentController;
-use App\Http\Controllers\Api\LeadDocumentController;
 // Rewards Controllers
 use App\Http\Controllers\Api\Rewards\RewardController;
 use App\Http\Controllers\Api\Rewards\BadgeController;
@@ -47,17 +46,13 @@ Route::get('/lead-statuses', function () {
 // Leads
 Route::patch('/leads/{id}/toggle-active', [LeadController::class, 'toggleActive']);
 Route::post('/leads/{id}/convert', [LeadController::class, 'convertToClient']);
-Route::get('/leads/check-cedula-folder', [LeadDocumentController::class, 'checkCedulaFolder']);
 Route::apiResource('leads', LeadController::class);
-Route::post('/leads/create-cedula-folder', [LeadDocumentController::class, 'createCedulaFolder']);
-Route::post('/leads/{lead}/documents', [LeadDocumentController::class, 'store']);
-Route::get('/leads/{lead}/documents', [LeadDocumentController::class, 'index']);
-Route::delete('/leads/documents', [LeadDocumentController::class, 'destroy']);
+
 // Clientes
-Route::get('/clients/check-cedula-folder', [\App\Http\Controllers\Api\ClientDocumentController::class, 'checkCedulaFolder']);
 Route::apiResource('clients', ClientController::class);
 Route::post('/opportunities/{id}/move-files', [OpportunityController::class, 'moveFiles']);
 Route::get('/opportunities/{id}/files', [OpportunityController::class, 'getFiles']);
+
 // Oportunidades
 Route::apiResource('opportunities', OpportunityController::class);
 
@@ -72,9 +67,11 @@ Route::delete('credits/{id}/documents/{documentId}', [\App\Http\Controllers\Api\
 // Deductoras
 Route::apiResource('deductoras', \App\Http\Controllers\Api\DeductoraController::class);
 
-// Documentos de Personas (Leads/Clientes)
+// Documentos de Personas (Leads/Clientes) - Unificado
+Route::get('/person-documents', [PersonDocumentController::class, 'index']);
 Route::post('/person-documents', [PersonDocumentController::class, 'store']);
 Route::delete('/person-documents/{id}', [PersonDocumentController::class, 'destroy']);
+Route::get('/person-documents/check-cedula-folder', [PersonDocumentController::class, 'checkCedulaFolder']);
 
 // Pagos de Crédito
 Route::apiResource('credit-payments', CreditPaymentController::class);

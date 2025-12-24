@@ -131,9 +131,7 @@ export function CreateOpportunityDialog({
         return;
       }
       try {
-        const url = isLeadContext
-          ? `/api/leads/check-cedula-folder?cedula=${cedula}`
-          : `/api/clients/check-cedula-folder?cedula=${cedula}`;
+        const url = `/api/person-documents/check-cedula-folder?cedula=${cedula}`;
         const res = await api.get(url);
         setHasDocuments(!!res.data.exists);
       } catch (e) {
