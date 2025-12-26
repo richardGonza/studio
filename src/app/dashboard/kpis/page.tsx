@@ -9,6 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Users,
   Target,
   TrendingUp,
@@ -739,28 +745,24 @@ export default function KPIsPage() {
           <Button variant="outline" size="icon" onClick={fetchKPIs} disabled={isLoading}>
             <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
           </Button>
-          <div className="flex items-center border rounded-md">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExportExcel}
-              disabled={isLoading}
-              className="rounded-r-none border-r"
-            >
-              <FileSpreadsheet className="h-4 w-4 mr-1" />
-              Excel
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExportPDF}
-              disabled={isLoading}
-              className="rounded-l-none"
-            >
-              <FileText className="h-4 w-4 mr-1" />
-              PDF
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" disabled={isLoading}>
+                <Download className="h-4 w-4 mr-2" />
+                Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleExportExcel}>
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Exportar a Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportPDF}>
+                <FileText className="h-4 w-4 mr-2" />
+                Exportar a PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           {lastUpdated && (
             <Badge variant="outline" className="text-sm">
               <Activity className="h-3 w-3 mr-1" />
