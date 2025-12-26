@@ -658,8 +658,8 @@ export default function KPIsPage() {
     return labels[p] || p;
   };
 
-  const handleExportExcel = () => {
-    exportToExcel({
+  const handleExportExcel = async () => {
+    await exportToExcel({
       leads: leadKPIs,
       opportunities: opportunityKPIs,
       credits: creditKPIs,

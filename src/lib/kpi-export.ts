@@ -1,6 +1,7 @@
+'use client';
+
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
 
 // Types
 interface KPIData {
@@ -102,7 +103,8 @@ const formatKPIValue = (kpi: KPIData | undefined): string => {
 };
 
 // Export to Excel
-export const exportToExcel = (data: AllKPIData, period: string): void => {
+export const exportToExcel = async (data: AllKPIData, period: string): Promise<void> => {
+  const XLSX = await import('xlsx');
   const workbook = XLSX.utils.book_new();
   const dateStr = new Date().toLocaleDateString('es-CR');
 
