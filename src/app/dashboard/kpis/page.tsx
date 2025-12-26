@@ -118,6 +118,7 @@ interface AgentKPIs {
     conversionRate: number;
     creditsOriginated: number;
     avgDealSize: number;
+    activityRate: number;
   }[];
 }
 
@@ -128,6 +129,7 @@ interface GamificationKPIs {
   challengeParticipation: KPIData;
   redemptionRate: KPIData;
   streakRetention: KPIData;
+  leaderboardMovement: KPIData;
   levelDistribution: { level: number; count: number }[];
 }
 
@@ -135,6 +137,8 @@ interface BusinessHealthKPIs {
   clv: KPIData;
   cac: KPIData;
   portfolioGrowth: KPIData;
+  nps: KPIData;
+  revenuePerEmployee: KPIData;
 }
 
 interface TrendDataPoint {
@@ -1071,7 +1075,7 @@ export default function KPIsPage() {
             title="Rendimiento de Agentes"
             description="Métricas de desempeño individual"
             icon={UserCheck}
-            headers={["Agente", "Leads", "Conversión", "Créditos", "Monto Promedio"]}
+            headers={["Agente", "Leads", "Conversión", "Créditos", "Monto Prom.", "Actividad"]}
             rows={(agentKPIs?.topAgents ?? []).map(agent => [
               <div key={agent.name} className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
@@ -1088,7 +1092,11 @@ export default function KPIsPage() {
                 {agent.conversionRate}%
               </Badge>,
               agent.creditsOriginated,
-              formatCurrency(agent.avgDealSize)
+              formatCurrency(agent.avgDealSize),
+              <div key={`${agent.name}-activity`} className="flex items-center gap-1">
+                <Activity className="h-3 w-3 text-muted-foreground" />
+                <span>{agent.activityRate || 0}/día</span>
+              </div>
             ])}
             isLoading={isLoading}
           />
@@ -1156,13 +1164,23 @@ export default function KPIsPage() {
               colorClass="text-orange-500"
               isLoading={isLoading}
             />
+            <StatCard
+              title="Movimiento en Leaderboard"
+              value={gamificationKPIs?.leaderboardMovement?.value ?? 0}
+              unit={gamificationKPIs?.leaderboardMovement?.unit}
+              change={gamificationKPIs?.leaderboardMovement?.change}
+              icon={TrendingUp}
+              description="Cambios de posición promedio"
+              colorClass="text-cyan-500"
+              isLoading={isLoading}
+            />
           </div>
           <LevelDistributionChart levels={gamificationKPIs?.levelDistribution ?? []} isLoading={isLoading} />
         </TabsContent>
 
         {/* Business Health KPIs */}
         <TabsContent value="business" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
             <StatCard
               title="Customer Lifetime Value (CLV)"
               value={formatCurrency(Number(businessHealthKPIs?.clv?.value) || 0)}
@@ -1190,6 +1208,25 @@ export default function KPIsPage() {
               icon={TrendingUp}
               description="Crecimiento mes a mes"
               colorClass="text-emerald-500"
+              isLoading={isLoading}
+            />
+            <StatCard
+              title="Net Promoter Score (NPS)"
+              value={businessHealthKPIs?.nps?.value ?? 0}
+              unit={businessHealthKPIs?.nps?.unit}
+              change={businessHealthKPIs?.nps?.change}
+              icon={Star}
+              description="Satisfacción del cliente"
+              colorClass="text-yellow-500"
+              isLoading={isLoading}
+            />
+            <StatCard
+              title="Ingreso por Empleado"
+              value={formatCurrency(Number(businessHealthKPIs?.revenuePerEmployee?.value) || 0)}
+              change={businessHealthKPIs?.revenuePerEmployee?.change}
+              icon={Users}
+              description="Eficiencia de personal"
+              colorClass="text-purple-500"
               isLoading={isLoading}
             />
           </div>

@@ -56,6 +56,7 @@ interface AgentKPIs {
     conversionRate: number;
     creditsOriginated: number;
     avgDealSize: number;
+    activityRate: number;
   }[];
 }
 
@@ -66,6 +67,7 @@ interface GamificationKPIs {
   challengeParticipation: KPIData;
   redemptionRate: KPIData;
   streakRetention: KPIData;
+  leaderboardMovement: KPIData;
   levelDistribution: { level: number; count: number }[];
 }
 
@@ -73,6 +75,8 @@ interface BusinessHealthKPIs {
   clv: KPIData;
   cac: KPIData;
   portfolioGrowth: KPIData;
+  nps: KPIData;
+  revenuePerEmployee: KPIData;
 }
 
 interface AllKPIData {
@@ -212,15 +216,16 @@ export const exportToExcel = async (data: AllKPIData, period: string): Promise<v
   // Agents Sheet
   if (data.agents?.topAgents) {
     const agentsData = [
-      ['RENDIMIENTO DE AGENTES', '', '', '', ''],
-      ['', '', '', '', ''],
-      ['Agente', 'Leads', 'Conversión', 'Créditos', 'Monto Promedio'],
+      ['RENDIMIENTO DE AGENTES', '', '', '', '', ''],
+      ['', '', '', '', '', ''],
+      ['Agente', 'Leads', 'Conversión', 'Créditos', 'Monto Promedio', 'Actividad/día'],
       ...data.agents.topAgents.map(a => [
         a.name,
         a.leadsHandled,
         `${a.conversionRate}%`,
         a.creditsOriginated,
         formatCurrency(a.avgDealSize),
+        a.activityRate || 0,
       ]),
     ];
     const agentsSheet = XLSX.utils.aoa_to_sheet(agentsData);
@@ -239,6 +244,7 @@ export const exportToExcel = async (data: AllKPIData, period: string): Promise<v
       ['Participación en Challenges', data.gamification.challengeParticipation.value, `${data.gamification.challengeParticipation.change || 0}%`],
       ['Tasa de Canje', formatKPIValue(data.gamification.redemptionRate), `${data.gamification.redemptionRate.change || 0}%`],
       ['Retención de Rachas', formatKPIValue(data.gamification.streakRetention), `${data.gamification.streakRetention.change || 0}%`],
+      ['Movimiento en Leaderboard', formatKPIValue(data.gamification.leaderboardMovement), `${data.gamification.leaderboardMovement?.change || 0}%`],
       ['', '', ''],
       ['DISTRIBUCIÓN POR NIVEL', '', ''],
       ['Nivel', 'Usuarios', ''],
@@ -257,6 +263,8 @@ export const exportToExcel = async (data: AllKPIData, period: string): Promise<v
       ['Customer Lifetime Value (CLV)', formatKPIValue(data.business.clv), `${data.business.clv.change || 0}%`],
       ['Customer Acquisition Cost (CAC)', formatKPIValue(data.business.cac), `${data.business.cac.change || 0}%`],
       ['Crecimiento de Cartera', formatKPIValue(data.business.portfolioGrowth), `${data.business.portfolioGrowth.change || 0}%`],
+      ['Net Promoter Score (NPS)', data.business.nps?.value || 0, `${data.business.nps?.change || 0}%`],
+      ['Ingreso por Empleado', formatCurrency(Number(data.business.revenuePerEmployee?.value) || 0), `${data.business.revenuePerEmployee?.change || 0}%`],
       ['', '', ''],
       ['Ratio CLV:CAC', `${((Number(data.business.clv.value) || 1) / (Number(data.business.cac.value) || 1)).toFixed(1)}:1`, ''],
     ];
@@ -449,6 +457,8 @@ export const exportToPDF = (data: AllKPIData, period: string): void => {
       ['Customer Lifetime Value (CLV)', formatKPIValue(data.business.clv), `${data.business.clv.change || 0}%`],
       ['Customer Acquisition Cost (CAC)', formatKPIValue(data.business.cac), `${data.business.cac.change || 0}%`],
       ['Crecimiento de Cartera', formatKPIValue(data.business.portfolioGrowth), `${data.business.portfolioGrowth.change || 0}%`],
+      ['Net Promoter Score (NPS)', String(data.business.nps?.value || 0), `${data.business.nps?.change || 0}%`],
+      ['Ingreso por Empleado', formatCurrency(Number(data.business.revenuePerEmployee?.value) || 0), `${data.business.revenuePerEmployee?.change || 0}%`],
       ['Ratio CLV:CAC', `${clvCacRatio}:1`, '-'],
     ];
 
