@@ -373,7 +373,7 @@ class KpiSeeder extends Seeder
             'interes_moratorio' => 0,
             'amortizacion' => $plan->amortizacion,
             'saldo_anterior' => $plan->saldo_anterior,
-            'saldo_nuevo' => $plan->saldo_nuevo,
+            'nuevo_saldo' => $plan->saldo_nuevo,
             'estado' => $estado,
             'fecha_movimiento' => $fechaPago,
             'movimiento_total' => $cuota,
