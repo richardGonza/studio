@@ -496,9 +496,9 @@ class KpiSeeder extends Seeder
     private function createChallengesAndParticipation(): void
     {
         $challenges = [
-            ['name' => 'Reto Semanal', 'description' => 'Crea 5 créditos esta semana', 'points_reward' => 500],
-            ['name' => 'Meta Mensual', 'description' => 'Alcanza el 100% de tu meta', 'points_reward' => 1000],
-            ['name' => 'Cobro Perfecto', 'description' => '100% de cobro por 7 días', 'points_reward' => 750],
+            ['name' => 'Reto Semanal', 'description' => 'Crea 5 créditos esta semana', 'type' => 'individual', 'rewards' => ['points' => 500]],
+            ['name' => 'Meta Mensual', 'description' => 'Alcanza el 100% de tu meta', 'type' => 'individual', 'rewards' => ['points' => 1000]],
+            ['name' => 'Cobro Perfecto', 'description' => '100% de cobro por 7 días', 'type' => 'individual', 'rewards' => ['points' => 750]],
         ];
 
         $rewardUsers = RewardUser::all();
@@ -509,7 +509,8 @@ class KpiSeeder extends Seeder
                 [
                     'name' => $challengeData['name'],
                     'description' => $challengeData['description'],
-                    'rewards' => json_encode(['points' => $challengeData['points_reward']]),
+                    'type' => $challengeData['type'],
+                    'rewards' => json_encode($challengeData['rewards']),
                     'objectives' => json_encode(['count' => 5]),
                     'start_date' => now()->subDays(rand(30, 90)),
                     'end_date' => now()->addDays(rand(7, 30)),
