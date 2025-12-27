@@ -182,7 +182,6 @@ class KpiSeeder extends Seeder
         $this->command->info('💼 Seeding opportunities...');
 
         $now = Carbon::now();
-        $opportunityStatuses = ['Abierta', 'En seguimiento', 'Ganada', 'Perdida'];
         $types = ['Crédito Regular', 'Micro-crédito', 'Crédito Empresarial'];
 
         // Get all leads and clients
@@ -234,9 +233,11 @@ class KpiSeeder extends Seeder
     {
         $this->command->info('💰 Seeding credits and payments...');
 
-        // Get won opportunities
+        // Get won opportunities that don't have credits yet
+        $existingOpportunityIds = Credit::whereNotNull('opportunity_id')->pluck('opportunity_id')->toArray();
+
         $wonOpportunities = Opportunity::where('status', 'Ganada')
-            ->whereDoesntHave('credit')
+            ->whereNotIn('id', $existingOpportunityIds)
             ->with('lead')
             ->get();
 
@@ -394,7 +395,7 @@ class KpiSeeder extends Seeder
 
         // Create reward users for all users
         foreach ($this->users as $user) {
-            $rewardUser = RewardUser::firstOrCreate(
+            RewardUser::firstOrCreate(
                 ['user_id' => $user->id],
                 [
                     'total_points' => rand(100, 5000),
@@ -407,7 +408,7 @@ class KpiSeeder extends Seeder
             );
 
             // Create transactions for the past 12 months
-            $this->createRewardTransactions($user, $rewardUser);
+            $this->createRewardTransactions($user);
         }
 
         // Create badges
@@ -422,7 +423,7 @@ class KpiSeeder extends Seeder
         $this->command->info('   Gamification data created');
     }
 
-    private function createRewardTransactions(User $user, RewardUser $rewardUser): void
+    private function createRewardTransactions(User $user): void
     {
         $now = Carbon::now();
 
