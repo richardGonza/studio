@@ -276,7 +276,12 @@ export default function DealsPage() {
   const fetchOpportunities = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await api.get('/api/opportunities');
+      const params: any = {};
+      if (filters.createdFrom) params.date_from = filters.createdFrom;
+      if (filters.createdTo) params.date_to = filters.createdTo;
+      if (filters.status !== 'todos') params.status = filters.status;
+
+      const response = await api.get('/api/opportunities', { params });
       const data = response.data.data || response.data;
       
       setOpportunities(Array.isArray(data) ? data.map((item: any) => ({
@@ -291,7 +296,7 @@ export default function DealsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, filters.createdFrom, filters.createdTo, filters.status]);
 
   const fetchLeads = useCallback(async () => {
     try {
@@ -320,7 +325,7 @@ export default function DealsPage() {
     fetchOpportunities();
     fetchLeads();
     fetchUsers(); // <--- AGREGADO
-  }, [fetchOpportunities, fetchLeads, fetchUsers]);
+  }, [fetchOpportunities, fetchLeads, fetchUsers, filters]);
 
   // --- Form Logic ---
 
@@ -806,6 +811,9 @@ export default function DealsPage() {
           <div>
             <CardTitle>Oportunidades</CardTitle>
             <CardDescription>Gestiona las oportunidades asociadas a tus leads.</CardDescription>
+            <p className="text-sm text-muted-foreground mt-1">
+                {visibleOpportunities.length} {visibleOpportunities.length === 1 ? "oportunidad" : "oportunidades"}
+            </p>
           </div>
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex flex-wrap items-end gap-3">

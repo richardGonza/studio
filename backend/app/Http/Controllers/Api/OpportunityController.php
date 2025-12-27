@@ -35,6 +35,13 @@ class OpportunityController extends Controller
             $query->where('assigned_to_id', $request->input('assigned_to_id'));
         }
 
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->input('date_from'));
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->input('date_to'));
+        }
+
         $opportunities = $query->latest()->paginate(20);
 
         return response()->json($opportunities, 200);
